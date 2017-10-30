@@ -1,0 +1,14 @@
+{
+  "name": "linea",
+  "version": "1.0.0",
+  "description": "A javascript library to draw floorplans",
+  "main": "index.js",
+  "repository": "git@github.com:humbamp123/linea.git",
+  "author": "starcity-properties",
+  "license": "EPL",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "snapsvg": "^0.5.1",
+    "webpack": "^3.8.1"
+  }
+}
