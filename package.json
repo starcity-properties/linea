@@ -1,6 +1,6 @@
 {
   "name": "linea",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A javascript library to draw floorplans",
   "main": "index.js",
   "repository": "git@github.com:humbamp123/linea.git",
