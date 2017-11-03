@@ -8,7 +8,7 @@ import Snap from 'snapsvg-cjs';
 
 // console.log("room information: ");
 
-var room = {
+var roomData = {
     unit: {
         name: "room-01",
         code: "mission-room-01",
@@ -57,6 +57,16 @@ var room = {
                     // we might need to math the radius for the door by calculating the distance between p1 and p2
                 ]
             }
+        ],
+        interiorWall: [
+            {
+                type: "interiorWall",
+                label: "interior-room-01",
+                outline: [
+                    { x: 220, y: 210, radius: 0, curve: "none", index: 0 },
+                    { x: 220, y: 280, radius: 0, curve: "none", index: 1 },
+                ]
+            }
         ]
     }
 }
@@ -93,6 +103,7 @@ class Floorplan {
         this.doors = [];
 
         // Initialize other features??
+        this.interiorWalls = [];
 
     }
 
@@ -106,7 +117,7 @@ class Floorplan {
         // L indicate a straight line to (x, y)
         // Z closes the shape of the path
         points.forEach((point, index) => {
-            if (index == 0)
+            if (index === 0)
                 path.push("M", point.x, point.y);
             else if (point.radius > 0 && point.curve === "concave")
                 path.push("A", point.radius, point.radius, 0, 0, 1, point.x, point.y);
@@ -133,11 +144,30 @@ class Floorplan {
         })
     }
 
+    drawLine(points, strokeColor, strokeWidth) {
+        var windowPoints = [];
+
+        points.outline.forEach((point) => {
+            windowPoints.push(point.x, point.y);
+        })
+
+        this.windows.push(this.paper.polyline(windowPoints).attr({
+            stroke: strokeColor,
+            strokeWidth: strokeWidth
+        }))
+    }
+
     drawWindows(windows, strokeColor, strokeWidth) {
         windows.forEach((window) => {
-            console.log(window);
-            drawLine(window, strokeColor, strokeWidth);
+            // console.log(window);
+            this.drawLine(window, strokeColor, strokeWidth);
         });
+    }
+
+    drawInteriorWalls(walls, strokeColor, strokeWidth) {
+        walls.forEach((wall) => {
+            this.drawLine(wall, strokeColor, strokeWidth);
+        })
     }
 
     // drawCircle(x, y, z) {
@@ -148,29 +178,12 @@ class Floorplan {
     //         fill: "black"
     //     });
     // }
+
 }
 
 
 var roomRender = new Floorplan("#svg", 0, 0, windowWidth, windowHeight);
 // roomRender.drawCircle(90, 120, 80);
-roomRender.drawRoomOutline(roomData.room.outline, "lightgray", "black", 5);
+roomRender.drawRoomOutline(roomData.room.outline, "white", "black", 5);
 roomRender.drawWindows(roomData.features.windows, "cyan", 3);
-        // Creates a responsive viewBox of dimensions x and y, with optional minX and minY
-        this.paper.attr({ viewBox: minX + " " + minY + " " + x + " " + y });
-        this.paper.attr({ border: "solid 1px lightgrey" });
-        this.paper.attr({ padding: "10px" });
-       // this.circle = this.paper.circle(90,120,80);
-    }
-
-    drawCircle(x, y, z) {
-        console.log(x + " " + y + " "+ z);
-        this.paper.circle(x, y, z).attr({
-            fill: "black"
-        });
-    }
-}
-
-
-var newData = new Floorplan("#svg", 1000, 800, 600, 400);
-//var newData = new Floorplan("#svg", windowWidth, windowHeight, 600, 400);
-newData.drawCircle(90, 120, 80);
+roomRender.drawInteriorWalls(roomData.features.interiorWall, "black", 5);
