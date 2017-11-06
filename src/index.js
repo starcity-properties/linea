@@ -1,12 +1,6 @@
 import registerServiceWorker from './registerServiceWorker';
 import Snap from 'snapsvg-cjs';
-// const Snap = window.Snap;
-
-// import Snap from 'snapsvg';
-
-// console.log("TEST");
-
-// console.log("room information: ");
+import './index.css'; 
 
 var roomData = {
     unit: {
@@ -71,19 +65,6 @@ var roomData = {
     }
 }
 
-
-// console.log(room);
-
-var elem = (document.compatMode === "CSS1Compat") ? 
-    document.documentElement :
-    document.body;
-
-var windowHeight = elem.clientHeight;
-var windowWidth = elem.clientWidth;
-
-console.log("height: " + windowHeight);
-console.log("width " + windowWidth);
-
 class Floorplan {
     constructor(id, minX, minY, x, y) {
         // Create Snap with ID associated with HTML SVG. e.g. <svg id="svg">
@@ -125,7 +106,7 @@ class Floorplan {
                 path.push("A", point.radius, point.radius, 0, 0, 0, point.x, point.y);
             else
                 path.push("L", point.x, point.y);
-        })
+        });
         path.push("Z");
 
         // make a string out of path
@@ -141,7 +122,7 @@ class Floorplan {
             fill: fill,
             stroke: strokeColor,
             strokeWidth: strokeWidth
-        })
+        });
     }
 
     drawLine(points, strokeColor, strokeWidth) {
@@ -149,12 +130,12 @@ class Floorplan {
 
         points.outline.forEach((point) => {
             windowPoints.push(point.x, point.y);
-        })
+        });
 
         this.windows.push(this.paper.polyline(windowPoints).attr({
             stroke: strokeColor,
             strokeWidth: strokeWidth
-        }))
+        }));
     }
 
     drawWindows(windows, strokeColor, strokeWidth) {
@@ -167,23 +148,14 @@ class Floorplan {
     drawInteriorWalls(walls, strokeColor, strokeWidth) {
         walls.forEach((wall) => {
             this.drawLine(wall, strokeColor, strokeWidth);
-        })
+        });
     }
-
-    // drawCircle(x, y, z) {
-    //     console.log(x + " " + y + " "+ z);
-    //     this.paper.circle(x, y, z).attr({
-    //         stroke: "black",
-    //         strokeWidth: 3,
-    //         fill: "black"
-    //     });
-    // }
-
 }
 
 
-var roomRender = new Floorplan("#svg", 0, 0, windowWidth, windowHeight);
-// roomRender.drawCircle(90, 120, 80);
+var roomRender = new Floorplan("#svg", 0, 0, 1000, 1000);
 roomRender.drawRoomOutline(roomData.room.outline, "white", "black", 5);
 roomRender.drawWindows(roomData.features.windows, "cyan", 3);
 roomRender.drawInteriorWalls(roomData.features.interiorWall, "black", 5);
+
+registerServiceWorker()
