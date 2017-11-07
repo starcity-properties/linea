@@ -1,6 +1,6 @@
 import registerServiceWorker from './registerServiceWorker';
 import Snap from 'snapsvg-cjs';
-import './index.css'; 
+import './index.css';
 
 var roomData = {
     unit: {
@@ -52,13 +52,32 @@ var roomData = {
                 ]
             }
         ],
+        slidingDoors: [
+            {
+                type: "slidingDoor",
+                label: "slidingDoor-room-01",
+                outline: [
+                    { x: 220, y: 230, index: 0},
+                    { x: 220, y: 180, index: 1},
+                    { x: 220, y: 130, index: 2}
+                ]
+            }
+        ],
         interiorWalls: [
             {
                 type: "interiorWall",
                 label: "interior-room-01",
                 outline: [
-                    { x: 220, y: 210, radius: 0, curve: "none", index: 0 },
+                    { x: 220, y: 180, radius: 0, curve: "none", index: 0 },
                     { x: 220, y: 280, radius: 0, curve: "none", index: 1 },
+                ]
+            },
+            {
+                type: "interiorWall",
+                label: "interior-room-02",
+                outline: [
+                    { x: 10, y: 130, radius: 0, curve: "none", index: 0 },
+                    { x: 220, y: 130, radius: 0, curve: "none", index: 1 },
                 ]
             }
         ]
@@ -73,15 +92,30 @@ class Floorplan {
         // Creates a responsive viewBox of dimensions x and y, with optional minX and minY
         // Separate function for making the string to pass into viewBox?
         this.paper.attr({ viewBox: minX + " " + minY + " " + x + " " + y });
+        this.minX = minX;
+        this.minY = minY;
+        this.maxX = x;
+        this.maxY = y;
+
+        // Initialize major grid lines
+        this.majorGrid = [];
+
+        // Initialize minor grid lines
+        this.minorGrid = [];
 
         // Initialize walls
         this.wall = [];
+
+        // Initialize interiorWalls
+        this.interiorWalls = [];
 
         // Initialize windows
         this.windows = [];
 
         // Initialize door
         this.doors = [];
+
+        // Initialize slidingDoors
         this.slidingDoors = [];
 
         // Initialize other features??
@@ -90,7 +124,7 @@ class Floorplan {
     }
 
     // Function to create the string to draw path
-    compilePath(points) {
+    compilePath(points, closed) {
         // console.log(points);
         var path = [];
 
@@ -109,21 +143,24 @@ class Floorplan {
             else
                 path.push("L", point.x, point.y);
         });
-        path.push("Z");
+        if (closed) {
+            path.push("Z");
+        }
       
         // make a string out of path
         return (path.join(" "));
     }
 
     drawRoomOutline(points, fill, strokeColor, strokeWidth) {
-        // compilePath() takes points and makes the string to pass into path? 
-        this.wall = this.paper.path(this.compilePath(points, 1));
+        // compilePath() takes points and makes the string to pass into path?
+        this.wall = this.paper.path(this.compilePath(points, true));
 
         // give style to shape
         this.wall.attr({
             fill: fill,
             stroke: strokeColor,
-            strokeWidth: strokeWidth
+            strokeWidth: strokeWidth,
+            fillOpacity: .5
         });
     }
 
@@ -139,29 +176,42 @@ class Floorplan {
 
     // takes array of points, strokeColor and strokeWidth to draw a polyline. Minimum of on segment.
     drawLine(points, strokeColor, strokeWidth) {
-        this.windows.push(this.paper.polyline(points).attr({
+        return(this.paper.polyline(points).attr({
             stroke: strokeColor,
             strokeWidth: strokeWidth
         }));
     }
 
+    drawWindow(window, strokeColor, strokeWidth) {
+        var points = this.lineArrayGenerator(window.outline);
+        this.windows.push(this.drawLine(points, strokeColor, strokeWidth));
+    }
+
     drawWindows(windows, strokeColor, strokeWidth) {
         windows.forEach((window) => {
-            var points = this.lineArrayGenerator(window.outline);
-            this.drawLine(points, strokeColor, strokeWidth);
+            this.drawWindow(window, strokeColor, strokeWidth);
         });
+    }
+
+    drawInteriorWall(wall, strokeColor, strokeWidth) {
+        var points = this.lineArrayGenerator(wall.outline);
+        this.interiorWalls.push(this.drawLine(points, strokeColor, strokeWidth));
     }
 
     drawInteriorWalls(walls, strokeColor, strokeWidth) {
         walls.forEach((wall) => {
-            var points = this.lineArrayGenerator(wall.outline);
-            this.drawLine(points, strokeColor, strokeWidth);
+            this.drawInteriorWall(wall, strokeColor, strokeWidth);
         });
+    }
+
+    drawDoor(door, strokeColor, strokeWidth) {
+        var points = this.lineArrayGenerator(door.outline);
+        this.doors.push(this.drawLine(points, strokeColor, strokeWidth));
     }
 
     drawDoors(doors, strokeColor, strokeWidth) {
         doors.forEach((door) => {
-            this.drawLine(door, strokeColor, strokeWidth);
+            this.drawDoor(door, strokeColor, strokeWidth);
         });
     }
 
@@ -195,13 +245,80 @@ class Floorplan {
     removeFeature() {
         
     }
+
+    drawSlidingDoor(slidingDoor, strokeColor, strokeWidth) {
+        var slidingDoorLines = [];
+        var doorSegment= [];
+        var dottedSegment = [];
+        doorSegment.push(slidingDoor.outline[0], slidingDoor.outline[1]);
+        dottedSegment.push(slidingDoor.outline[1], slidingDoor.outline[2]);
+        slidingDoorLines.push(
+            this.drawLine(this.lineArrayGenerator(doorSegment), strokeColor, strokeWidth),
+            this.drawLine(this.lineArrayGenerator(dottedSegment), strokeColor, strokeWidth).attr({
+                strokeDasharray: "10 10",
+                strokeLinecap: "round"
+            })
+        );
+        this.slidingDoors.push(slidingDoorLines);
+    }
+
+    drawSlidingDoors(slidingDoors) {
+        slidingDoors.forEach((item) => {
+            this.drawSlidingDoor(item, "teal", 3);
+        });
+    }
+
+    drawGrid(unitLength) {
+        var xMax = this.maxX / unitLength;
+        var yMax = this.maxY / unitLength;
+        for(var i = 0; i < yMax - 1; i++) {
+            var horizontalLines = {
+                outline:  [
+                    {
+                        x: 10,
+                        y: 10 + i * unitLength
+                    },
+                    {
+                        x: (xMax * unitLength) - 10,
+                        y: 10 + i * unitLength
+                    }
+                ]};
+            if (i % 5 === 0) {
+                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), "#c1c1c1", 1));
+            } else {
+                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), "lightgrey", 1));
+            }
+        }
+        for(var j = 0; j < xMax - 1; j++) {
+            var verticalLines = {
+                outline:  [
+                    {
+                        x: 10 + j * unitLength,
+                        y: 10
+                    },
+                    {
+                        x: 10 + j * unitLength,
+                        y: (yMax * unitLength) - 10
+                    }
+                ]};
+            if (j % 5 === 0) {
+                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), "#c1c1c1", 1));
+            } else {
+                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), "lightgrey", 1));
+            }
+        }
+    }
 }
 
 
-roomRender.drawRoom(roomData);
-var roomRender = new Floorplan("#svg", 0, 0, 1000, 1000);
-roomRender.drawRoomOutline(roomData.room.outline, "white", "black", 5);
-roomRender.drawWindows(roomData.features.windows, "cyan", 3);
-roomRender.drawInteriorWalls(roomData.features.interiorWall, "black", 5);
 
-registerServiceWorker()
+
+
+var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
+roomRender.drawGrid(10);
+// roomRender.drawRoom(roomData);
+roomRender.drawRoomOutline(roomData.room.outline, "lightgrey", "black", 5);
+roomRender.drawWindows(roomData.features.windows, "cyan", 3);
+roomRender.drawInteriorWalls(roomData.features.interiorWalls, "black", 5);
+roomRender.drawSlidingDoors(roomData.features.slidingDoors);
+registerServiceWorker();
