@@ -47,12 +47,12 @@ var roomData = {
                 outline: [
                     { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
-                    { x: 340, y: 230, radius: 40, curve: "none", index: 2 }
+                    { x: 340, y: 230, radius: 40, curve: "concave", index: 2 }
                     // we might need to math the radius for the door by calculating the distance between p1 and p2
                 ]
             }
         ],
-        interiorWall: [
+        interiorWalls: [
             {
                 type: "interiorWall",
                 label: "interior-room-01",
@@ -82,14 +82,16 @@ class Floorplan {
 
         // Initialize door
         this.doors = [];
+        this.slidingDoors = [];
 
         // Initialize other features??
         this.interiorWalls = [];
-
+        this.furniture = [];
     }
 
-    // Function to create the string to draw path.
+    // Function to create the string to draw path
     compilePath(points) {
+        // console.log(points);
         var path = [];
 
         // Iterates through each point object to create path
@@ -108,14 +110,14 @@ class Floorplan {
                 path.push("L", point.x, point.y);
         });
         path.push("Z");
-
+      
         // make a string out of path
         return (path.join(" "));
     }
 
     drawRoomOutline(points, fill, strokeColor, strokeWidth) {
         // compilePath() takes points and makes the string to pass into path? 
-        this.wall = this.paper.path(this.compilePath(points));
+        this.wall = this.paper.path(this.compilePath(points, 1));
 
         // give style to shape
         this.wall.attr({
@@ -125,14 +127,19 @@ class Floorplan {
         });
     }
 
-    drawLine(points, strokeColor, strokeWidth) {
-        var windowPoints = [];
+    // takes outline object and created array of points to be fed into polyline draw 
+    lineArrayGenerator(outline) {
+        var linePoints = [];
 
-        points.outline.forEach((point) => {
-            windowPoints.push(point.x, point.y);
+        outline.forEach((point) => {
+            linePoints.push(point.x, point.y);
         });
+        return linePoints;
+    }
 
-        this.windows.push(this.paper.polyline(windowPoints).attr({
+    // takes array of points, strokeColor and strokeWidth to draw a polyline. Minimum of on segment.
+    drawLine(points, strokeColor, strokeWidth) {
+        this.windows.push(this.paper.polyline(points).attr({
             stroke: strokeColor,
             strokeWidth: strokeWidth
         }));
@@ -140,19 +147,58 @@ class Floorplan {
 
     drawWindows(windows, strokeColor, strokeWidth) {
         windows.forEach((window) => {
-            // console.log(window);
-            this.drawLine(window, strokeColor, strokeWidth);
+            var points = this.lineArrayGenerator(window.outline);
+            this.drawLine(points, strokeColor, strokeWidth);
         });
     }
 
     drawInteriorWalls(walls, strokeColor, strokeWidth) {
         walls.forEach((wall) => {
-            this.drawLine(wall, strokeColor, strokeWidth);
+            var points = this.lineArrayGenerator(wall.outline);
+            this.drawLine(points, strokeColor, strokeWidth);
         });
+    }
+
+    drawDoors(doors, strokeColor, strokeWidth) {
+        doors.forEach((door) => {
+            this.drawLine(door, strokeColor, strokeWidth);
+        });
+    }
+
+    drawRoom(room) {
+        // TODO: draw room outline
+        this.drawRoomOutline(room.room.outline, "#efe3e6", "black", 7);
+
+        // TODO: draw inside walls
+        this.drawInteriorWalls(room.features.interiorWalls, "black", 7);
+
+        // TODO: draw windows
+        this.drawWindows(room.features.windows, "#f9f9f9", 4);
+
+        // TODO: draw door
+        console.log(room.features.door);
+        this.drawRoomOutline(room.features.door[0].outline, "none", "red", 4);
+
+        // TODO: draw sliding doors
+
+        // TODO: draw furniture
+    }
+
+    update() {
+        // TODO: updating outline or features. Events, moving furniture around, etc
+    }
+
+    addFeature() {
+        
+    }
+
+    removeFeature() {
+        
     }
 }
 
 
+roomRender.drawRoom(roomData);
 var roomRender = new Floorplan("#svg", 0, 0, 1000, 1000);
 roomRender.drawRoomOutline(roomData.room.outline, "white", "black", 5);
 roomRender.drawWindows(roomData.features.windows, "cyan", 3);
