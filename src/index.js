@@ -1,12 +1,6 @@
 import registerServiceWorker from './registerServiceWorker';
 import Snap from 'snapsvg-cjs';
-// const Snap = window.Snap;
-
-// import Snap from 'snapsvg';
-
-// console.log("TEST");
-
-// console.log("room information: ");
+import './index.css'; 
 
 var roomData = {
     unit: {
@@ -71,16 +65,6 @@ var roomData = {
     }
 }
 
-
-// Code to get viewport dimensions
-var elem = (document.compatMode === "CSS1Compat") ? 
-    document.documentElement :
-    document.body;
-
-var windowHeight = elem.clientHeight;
-var windowWidth = elem.clientWidth;
-
-// Floorplan class starts here
 class Floorplan {
     constructor(id, minX, minY, x, y) {
         // Create Snap with ID associated with HTML SVG. e.g. <svg id="svg">
@@ -106,7 +90,7 @@ class Floorplan {
     }
 
     // Function to create the string to draw path
-    compilePath(points, closePath) {
+    compilePath(points) {
         // console.log(points);
         var path = [];
 
@@ -125,9 +109,8 @@ class Floorplan {
             else
                 path.push("L", point.x, point.y);
         });
-        if (closePath)
-            path.push("Z");
-
+        path.push("Z");
+      
         // make a string out of path
         return (path.join(" "));
     }
@@ -151,7 +134,6 @@ class Floorplan {
         outline.forEach((point) => {
             linePoints.push(point.x, point.y);
         });
-
         return linePoints;
     }
 
@@ -216,15 +198,10 @@ class Floorplan {
 }
 
 
-var roomRender = new Floorplan("#svg", 0, 0, windowWidth, windowHeight);
 roomRender.drawRoom(roomData);
+var roomRender = new Floorplan("#svg", 0, 0, 1000, 1000);
+roomRender.drawRoomOutline(roomData.room.outline, "white", "black", 5);
+roomRender.drawWindows(roomData.features.windows, "cyan", 3);
+roomRender.drawInteriorWalls(roomData.features.interiorWall, "black", 5);
 
-
-// drawCircle(x, y, z) {
-//     console.log(x + " " + y + " "+ z);
-//     this.paper.circle(x, y, z).attr({
-//         stroke: "black",
-//         strokeWidth: 3,
-//         fill: "black"
-//     });
-// }
+registerServiceWorker()
