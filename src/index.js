@@ -40,14 +40,14 @@ var roomData = {
                 ]
             }
         ],
-        door: [
+        doors: [
             {
                 type: "door",
                 label: "door-room-01",
                 outline: [
                     { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
-                    { x: 340, y: 230, radius: 40, curve: "concave", index: 2 }
+                    // { x: 340, y: 230, radius: 40, curve: "concave", index: 2 }
                     // we might need to math the radius for the door by calculating the distance between p1 and p2
                 ]
             }
@@ -103,6 +103,11 @@ class Floorplan {
         // Initialize minor grid lines
         this.minorGrid = [];
 
+        // Initialize major grid lines
+        this.majorGrid = [];
+
+        // Initialize minor grid lines
+        this.minorGrid = [];
         // Initialize walls
         this.wall = [];
 
@@ -146,7 +151,7 @@ class Floorplan {
         if (closed) {
             path.push("Z");
         }
-      
+
         // make a string out of path
         return (path.join(" "));
     }
@@ -164,7 +169,7 @@ class Floorplan {
         });
     }
 
-    // takes outline object and created array of points to be fed into polyline draw 
+    // takes outline object and created array of points to be fed into polyline draw
     lineArrayGenerator(outline) {
         var linePoints = [];
 
@@ -174,7 +179,6 @@ class Floorplan {
         return linePoints;
     }
 
-    // takes array of points, strokeColor and strokeWidth to draw a polyline. Minimum of on segment.
     drawLine(points, strokeColor, strokeWidth) {
         return(this.paper.polyline(points).attr({
             stroke: strokeColor,
@@ -204,17 +208,6 @@ class Floorplan {
         });
     }
 
-    drawDoor(door, strokeColor, strokeWidth) {
-        var points = this.lineArrayGenerator(door.outline);
-        this.doors.push(this.drawLine(points, strokeColor, strokeWidth));
-    }
-
-    drawDoors(doors, strokeColor, strokeWidth) {
-        doors.forEach((door) => {
-            this.drawDoor(door, strokeColor, strokeWidth);
-        });
-    }
-
     drawRoom(room) {
         // TODO: draw room outline
         this.drawRoomOutline(room.room.outline, "#efe3e6", "black", 7);
@@ -239,11 +232,11 @@ class Floorplan {
     }
 
     addFeature() {
-        
+
     }
 
     removeFeature() {
-        
+
     }
 
     drawSlidingDoor(slidingDoor, strokeColor, strokeWidth) {
@@ -262,9 +255,38 @@ class Floorplan {
         this.slidingDoors.push(slidingDoorLines);
     }
 
-    drawSlidingDoors(slidingDoors) {
+    drawSlidingDoors(slidingDoors, strokeColor, strokeWidth) {
         slidingDoors.forEach((item) => {
-            this.drawSlidingDoor(item, "teal", 3);
+            this.drawSlidingDoor(item, strokeColor, strokeWidth);
+        });
+    }
+
+    lineLength(linePoints) {
+        var xs = 0;
+        var ys = 0;
+
+        xs = linePoints[0] - linePoints[2];
+        xs = xs * xs;
+
+        ys = linePoints[1] - linePoints[3];
+        ys = ys * ys;
+
+        return Math.sqrt( xs + ys );
+    }
+
+    drawDoor(door, strokeColor, strokeWidth) {
+        var doorLines = [];
+        var doorPoints = this.lineArrayGenerator(door.outline);
+        var radius = this.lineLength(doorPoints);
+        console.log(radius);
+        // doorLines.push(this.drawLine(points, strokeColor, strokeWidth));
+
+        // this.doors.push(doorLines);
+    }
+
+    drawDoors(doors, strokeColor, strokeWidth) {
+        doors.forEach((door) => {
+            this.drawDoor(door, strokeColor, strokeWidth);
         });
     }
 
@@ -320,5 +342,6 @@ roomRender.drawGrid(10);
 roomRender.drawRoomOutline(roomData.room.outline, "lightgrey", "black", 5);
 roomRender.drawWindows(roomData.features.windows, "cyan", 3);
 roomRender.drawInteriorWalls(roomData.features.interiorWalls, "black", 5);
-roomRender.drawSlidingDoors(roomData.features.slidingDoors);
+roomRender.drawSlidingDoors(roomData.features.slidingDoors, "turquoise", 3);
+roomRender.drawDoors(roomData.features.doors, "pink", 3);
 registerServiceWorker();
