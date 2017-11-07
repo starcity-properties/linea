@@ -114,10 +114,9 @@ class Floorplan {
 
         // Initialize door
         this.doors = [];
-        this.slidingDoors = [];
 
         // Initialize slidingDoors
-        this.slidingdoors = [];
+        this.slidingDoors = [];
 
         // Initialize other features??
         this.interiorWalls = [];
@@ -205,9 +204,14 @@ class Floorplan {
         });
     }
 
+    drawDoor(door, strokeColor, strokeWidth) {
+        var points = this.lineArrayGenerator(door.outline);
+        this.doors.push(this.drawLine(points, strokeColor, strokeWidth));
+    }
+
     drawDoors(doors, strokeColor, strokeWidth) {
         doors.forEach((door) => {
-            this.drawLine(door, strokeColor, strokeWidth);
+            this.drawDoor(door, strokeColor, strokeWidth);
         });
     }
 
