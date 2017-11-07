@@ -103,6 +103,11 @@ class Floorplan {
         // Initialize minor grid lines
         this.minorGrid = [];
 
+        // Initialize major grid lines
+        this.majorGrid = [];
+
+        // Initialize minor grid lines
+        this.minorGrid = [];
         // Initialize walls
         this.wall = [];
 
@@ -174,7 +179,6 @@ class Floorplan {
         return linePoints;
     }
 
-    // takes array of points, strokeColor and strokeWidth to draw a polyline. Minimum of on segment.
     drawLine(points, strokeColor, strokeWidth) {
         return(this.paper.polyline(points).attr({
             stroke: strokeColor,
