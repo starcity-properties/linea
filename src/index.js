@@ -279,6 +279,7 @@ class Floorplan {
         return Math.sqrt( xLength + yLength );
     }
 
+    /*
     testDoorSide(door) {
         return (
             (door[1].x - door[0].x) * (door[2].y - door[0].y)
@@ -302,7 +303,6 @@ class Floorplan {
         }
     }
 
-    /*
     drawDoor(door, strokeColor, strokeWidth) {
         console.log(this.testDoorSide(door.outline));
         var doorLines = [];
