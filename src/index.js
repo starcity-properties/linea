@@ -53,8 +53,7 @@ var roomData = {
                 outline: [
                     { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
-                    // { x: 340, y: 230, radius: 40, curve: "concave", index: 2 }
-                    // we might need to math the radius for the door by calculating the distance between p1 and p2
+                    { x: 340, y: 230, radius: 40, curve: "concave", index: 2 }
                 ]
             }
         ],
@@ -161,11 +160,18 @@ class Floorplan {
 
     drawRoomOutline(points, id, style) {
         // compilePath() takes points and makes the string to pass into path?
-        this.wall = this.paper.path(this.compilePath(points, true));
+        this.wall = this.paper.path(this.compilePath(points, closed));
 
         // give style to shape and assign id to object
         this.wall.attr(style);
         this.wall.id = id;
+    }
+
+    pointArrayGenerator(point) {
+        var pointArray = [];
+
+        pointArray.push(point.x, point.y);
+        return (pointArray);
     }
 
     // takes outline object and created array of points to be fed into polyline draw
@@ -173,7 +179,7 @@ class Floorplan {
         var linePoints = [];
 
         outline.forEach((point) => {
-            linePoints.push(point.x, point.y);
+            linePoints.push(this.pointArrayGenerator(point));
         });
         return linePoints;
     }
@@ -268,22 +274,100 @@ class Floorplan {
     }
 
     lineLength(linePoints) {
-        var xs = 0;
-        var ys = 0;
+        var xLength= 0;
+        var yLength= 0;
+        xLength= linePoints[0].x - linePoints[1].x;
+        xLength= xLength * xLength;
 
-        xs = linePoints[0] - linePoints[2];
-        xs = xs * xs;
+        yLength= linePoints[0].y - linePoints[1].y;
+        yLength= yLength * yLength;
 
-        ys = linePoints[1] - linePoints[3];
-        ys = ys * ys;
+        return Math.sqrt( xLength + yLength );
+    }
 
-        return Math.sqrt( xs + ys );
+    /*
+    testDoorSide(door) {
+        return (
+            (door[1].x - door[0].x) * (door[2].y - door[0].y)
+                - ((door[1].y - door[0].y) * (door[2].x - door[0].x))
+        );
+    }
+
+    testCoordinate(centerPoint, testPoint) {
+        if (centerPoint.x - testPoint.x > 0) {
+            if (centerPoint.y - testPoint.y > 0) {
+                return(1);
+            } else {
+                return(3);
+            }
+        } else {
+            if (centerPoint.y - testPoint.y > 0) {
+                return(2);
+            } else {
+                return(4);
+            }
+        }
     }
 
     drawDoor(door, strokeColor, strokeWidth) {
+        console.log(this.testDoorSide(door.outline));
         var doorLines = [];
-        var doorPoints = this.lineArrayGenerator(door.outline);
-        var radius = this.lineLength(doorPoints);
+        var doorLine = [];
+        var doorCurve = [];
+        doorLine.push(door.outline[0], door.outline[1]);
+        var radius = this.lineLength(doorLine);
+        var radian1 = Math.PI;
+        var radian2 = Math.PI / 2;
+        var degree1 = radian1 * 180 / Math.PI;
+        var degree2 = radian2 * 180 / Math.PI;
+        console.log(degree1 + " " + degree2);
+        console.log("test" + radius * Math.cos(radian2));
+        var pointThreeX = radius * Math.cos(radian1) + doorLine[0].x - radius * Math.cos(radian2);
+        var pointThreeY = radius * Math.sin(radian1) + doorLine[0].y;
+        var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: "concave"};
+        var lineLengthTest = [];
+        lineLengthTest.push(door.outline[0], pointThree);
+        console.log(this.lineLength(lineLengthTest));
+        console.log(this.testCoordinate(door.outline[0], door.outline[1]));
+        doorCurve.push(door.outline[1], pointThree);
+        // console.log(door.outline[0]);
+        console.log(doorCurve);
+        this.drawCircle(doorLine[0], 5); // Point 1 Hinge
+        // this.drawCircle(doorLine[1], 5); // Point 2
+        // console.log(radius);
+
+        doorLines.push(
+            this.drawLine(this.lineArrayGenerator(doorLine), strokeColor, strokeWidth)
+        );
+        doorLines.push(
+            this.paper.path(this.compilePath(doorCurve, false)).attr({
+                fill: "transparent",
+                stroke: "lightgreen",
+                strokeWidth: strokeWidth
+            })
+        )
+        this.doors.push(doorLines);
+     } */
+
+    drawDoor(door, strokeColor, strokeWidth) {
+        var doorLines = [];
+        var doorLine = [];
+        var doorCurve = [];
+        var hingePoint = door.outline[0];
+        var endPoint = door.outline[1];
+        var curvePoint = door.outline[2];
+        doorLine.push(hingePoint, endPoint);
+        doorCurve.push(endPoint, curvePoint);
+        doorLines.push(
+            this.drawLine(this.lineArrayGenerator(doorLine), strokeColor, strokeWidth),
+            this.paper.path(this.compilePath(doorCurve, false)).attr({
+                fill: "transparent",
+                stroke: strokeColor,
+                strokeWidth: strokeWidth
+            })
+        );
+        this.doors.push(doorLines);
+        console.log(this.doors);
     }
 
     drawDoors(doors, strokeColor, strokeWidth) {
@@ -292,7 +376,7 @@ class Floorplan {
         });
     }
 
-    drawGrid(unitLength) {
+    drawGrid(unitLength, majorColor, minorColor) {
         var xMax = this.maxX / unitLength;
         var yMax = this.maxY / unitLength;
         for(var i = 0; i < yMax - 1; i++) {
@@ -331,6 +415,10 @@ class Floorplan {
                 this.minorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
             }
         }
+    }
+
+    drawCircle(centerPoint, radius) {
+        this.paper.circle(centerPoint.x, centerPoint.y, radius);
     }
 }
 
