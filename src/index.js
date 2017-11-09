@@ -1,6 +1,9 @@
 import registerServiceWorker from './registerServiceWorker';
 import Snap from 'snapsvg-cjs';
 import './index.css';
+import {style} from './styles.js';
+
+// console.log(style);
 
 var roomData = {
     unit: {
@@ -25,7 +28,8 @@ var roomData = {
         windows: [
             {
                 type: "window",
-                label: "window01-room-01",
+                code: "room-01-window01",
+                label: "window",
                 outline: [
                     { x: 10, y: 30, radius: 0, curve: "none", index: 0 },
                     { x: 10, y: 100, radius: 0, curve: "none", index: 1 }
@@ -33,7 +37,8 @@ var roomData = {
             },
             {
                 type: "window",
-                label: "window02-room-01",
+                code: "room-01-window02",
+                label: "window",
                 outline: [
                     { x: 10, y: 150, radius: 0, curve: "none", index: 0 },
                     { x: 10, y: 260, radius: 0, curve: "none", index: 1 }
@@ -43,7 +48,8 @@ var roomData = {
         doors: [
             {
                 type: "door",
-                label: "door-room-01",
+                code: "room-01-door01",
+                label: "door",
                 outline: [
                     { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
@@ -55,7 +61,8 @@ var roomData = {
         slidingDoors: [
             {
                 type: "slidingDoor",
-                label: "slidingDoor-room-01",
+                code: "room-01-slidingDoor01",
+                label: "sliding door",
                 outline: [
                     { x: 220, y: 230, index: 0},
                     { x: 220, y: 180, index: 1},
@@ -66,7 +73,8 @@ var roomData = {
         interiorWalls: [
             {
                 type: "interiorWall",
-                label: "interior-room-01",
+                code: "room-01-interiorWall01",
+                label: "interior wall",
                 outline: [
                     { x: 220, y: 180, radius: 0, curve: "none", index: 0 },
                     { x: 220, y: 280, radius: 0, curve: "none", index: 1 },
@@ -74,7 +82,8 @@ var roomData = {
             },
             {
                 type: "interiorWall",
-                label: "interior-room-02",
+                code: "room-01-interiorWall02",
+                label: "interior wall",
                 outline: [
                     { x: 10, y: 130, radius: 0, curve: "none", index: 0 },
                     { x: 220, y: 130, radius: 0, curve: "none", index: 1 },
@@ -103,11 +112,6 @@ class Floorplan {
         // Initialize minor grid lines
         this.minorGrid = [];
 
-        // Initialize major grid lines
-        this.majorGrid = [];
-
-        // Initialize minor grid lines
-        this.minorGrid = [];
         // Initialize walls
         this.wall = [];
 
@@ -124,7 +128,6 @@ class Floorplan {
         this.slidingDoors = [];
 
         // Initialize other features??
-        this.interiorWalls = [];
         this.furniture = [];
     }
 
@@ -156,17 +159,13 @@ class Floorplan {
         return (path.join(" "));
     }
 
-    drawRoomOutline(points, fill, strokeColor, strokeWidth) {
+    drawRoomOutline(points, id, style) {
         // compilePath() takes points and makes the string to pass into path?
         this.wall = this.paper.path(this.compilePath(points, true));
 
-        // give style to shape
-        this.wall.attr({
-            fill: fill,
-            stroke: strokeColor,
-            strokeWidth: strokeWidth,
-            fillOpacity: .5
-        });
+        // give style to shape and assign id to object
+        this.wall.attr(style);
+        this.wall.id = id;
     }
 
     // takes outline object and created array of points to be fed into polyline draw
@@ -179,56 +178,65 @@ class Floorplan {
         return linePoints;
     }
 
-    drawLine(points, strokeColor, strokeWidth) {
-        return(this.paper.polyline(points).attr({
-            stroke: strokeColor,
-            strokeWidth: strokeWidth
-        }));
+    drawLine(points, style) {
+        return(this.paper.polyline(points).attr(style));
     }
 
-    drawWindow(window, strokeColor, strokeWidth) {
+    drawWindow(window, style) {
         var points = this.lineArrayGenerator(window.outline);
-        this.windows.push(this.drawLine(points, strokeColor, strokeWidth));
+        this.windows.push(this.drawLine(points, style));
     }
 
-    drawWindows(windows, strokeColor, strokeWidth) {
-        windows.forEach((window) => {
-            this.drawWindow(window, strokeColor, strokeWidth);
+    drawWindows(windows, style) {
+        windows.forEach((window, index) => {
+            this.drawWindow(window, style);
+            this.windows[index].id = window.code;
         });
     }
 
-    drawInteriorWall(wall, strokeColor, strokeWidth) {
+    drawInteriorWall(wall, style) {
         var points = this.lineArrayGenerator(wall.outline);
-        this.interiorWalls.push(this.drawLine(points, strokeColor, strokeWidth));
+        this.interiorWalls.push(this.drawLine(points, style));
     }
 
-    drawInteriorWalls(walls, strokeColor, strokeWidth) {
-        walls.forEach((wall) => {
-            this.drawInteriorWall(wall, strokeColor, strokeWidth);
+    drawInteriorWalls(walls, style) {
+        walls.forEach((wall, index) => {
+            this.drawInteriorWall(wall, style);
+            this.interiorWalls[index].id = wall.code;
         });
     }
 
     drawRoom(room) {
         // TODO: draw room outline
-        this.drawRoomOutline(room.room.outline, "#efe3e6", "black", 7);
+        // this.drawRoomOutline(room.room.outline, room.unit.code, "#f4e4d7", "black", 8);
+        this.drawRoomOutline(room.room.outline, room.unit.code, style.roomOutline.default);
 
         // TODO: draw inside walls
-        this.drawInteriorWalls(room.features.interiorWalls, "black", 7);
+        // this.drawInteriorWalls(room.features.interiorWalls, "black", 8);
+        this.drawInteriorWalls(room.features.interiorWalls, style.interiorWalls.default);
 
         // TODO: draw windows
-        this.drawWindows(room.features.windows, "#f9f9f9", 4);
+        this.drawWindows(room.features.windows, style.windowStyle.default);
 
         // TODO: draw door
-        console.log(room.features.door);
-        this.drawRoomOutline(room.features.door[0].outline, "none", "red", 4);
+        // console.log(room.features.door);
+        // this.drawDoors(room.features.doors, "pink", 3);
 
         // TODO: draw sliding doors
+        this.drawSlidingDoors(room.features.slidingDoors, style.doorStyle);
 
         // TODO: draw furniture
     }
 
-    update() {
+    update(feature, id, attrObject) {
         // TODO: updating outline or features. Events, moving furniture around, etc
+        // what if the feature only has one item?? ie it's not an array...
+        feature.forEach((item) => {
+            if (item.id === id) {
+                console.log("updating");
+                item.attr(attrObject);
+            }
+        });
     }
 
     addFeature() {
@@ -239,25 +247,23 @@ class Floorplan {
 
     }
 
-    drawSlidingDoor(slidingDoor, strokeColor, strokeWidth) {
+    drawSlidingDoor(slidingDoor, style) {
         var slidingDoorLines = [];
         var doorSegment= [];
         var dottedSegment = [];
         doorSegment.push(slidingDoor.outline[0], slidingDoor.outline[1]);
         dottedSegment.push(slidingDoor.outline[1], slidingDoor.outline[2]);
         slidingDoorLines.push(
-            this.drawLine(this.lineArrayGenerator(doorSegment), strokeColor, strokeWidth),
-            this.drawLine(this.lineArrayGenerator(dottedSegment), strokeColor, strokeWidth).attr({
-                strokeDasharray: "10 10",
-                strokeLinecap: "round"
-            })
+            this.drawLine(this.lineArrayGenerator(doorSegment), style.door.default),
+            this.drawLine(this.lineArrayGenerator(dottedSegment), style.projection.default)
         );
         this.slidingDoors.push(slidingDoorLines);
     }
 
-    drawSlidingDoors(slidingDoors, strokeColor, strokeWidth) {
-        slidingDoors.forEach((item) => {
-            this.drawSlidingDoor(item, strokeColor, strokeWidth);
+    drawSlidingDoors(slidingDoors, style) {
+        slidingDoors.forEach((item, index) => {
+            this.drawSlidingDoor(item, style);
+            this.slidingDoors[index].id = item.code;
         });
     }
 
@@ -278,10 +284,6 @@ class Floorplan {
         var doorLines = [];
         var doorPoints = this.lineArrayGenerator(door.outline);
         var radius = this.lineLength(doorPoints);
-        console.log(radius);
-        // doorLines.push(this.drawLine(points, strokeColor, strokeWidth));
-
-        // this.doors.push(doorLines);
     }
 
     drawDoors(doors, strokeColor, strokeWidth) {
@@ -306,9 +308,9 @@ class Floorplan {
                     }
                 ]};
             if (i % 5 === 0) {
-                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), "#c1c1c1", 1));
+                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), {stroke: "#cccccc", strokeWidth: 1}));
             } else {
-                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), "lightgrey", 1));
+                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
             }
         }
         for(var j = 0; j < xMax - 1; j++) {
@@ -324,24 +326,25 @@ class Floorplan {
                     }
                 ]};
             if (j % 5 === 0) {
-                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), "#c1c1c1", 1));
+                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), {stroke: "#ccc", strokeWidth: 1}));
             } else {
-                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), "lightgrey", 1));
+                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
             }
         }
     }
 }
 
 
-
-
-
 var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
 roomRender.drawGrid(10);
-// roomRender.drawRoom(roomData);
-roomRender.drawRoomOutline(roomData.room.outline, "lightgrey", "black", 5);
-roomRender.drawWindows(roomData.features.windows, "cyan", 3);
-roomRender.drawInteriorWalls(roomData.features.interiorWalls, "black", 5);
-roomRender.drawSlidingDoors(roomData.features.slidingDoors, "turquoise", 3);
-roomRender.drawDoors(roomData.features.doors, "pink", 3);
+roomRender.drawRoom(roomData);
+
+// console.log(roomRender);
+// console.log(roomRender.windows);
+// console.log(roomRender.slidingDoors);
+
+setTimeout(function() {
+    roomRender.update(roomRender.windows, roomRender.windows[0].id, style.windowStyle.open);
+}, 5000);
+
 registerServiceWorker();
