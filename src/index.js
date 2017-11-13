@@ -2,6 +2,9 @@ import registerServiceWorker from './registerServiceWorker';
 import Snap from 'snapsvg-cjs';
 import './index.css';
 import { style } from './styles.js';
+import { ellisOne } from './ellis1.js';
+import { ellisTwo } from './ellis2.js';
+import { ellisThree } from './ellis3.js';
 
 // console.log(style);
 
@@ -610,14 +613,23 @@ class Floorplan {
 
 var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
 roomRender.drawGrid(10);
+
 roomRender.drawRoom(roomData);
+// setTimeout(function() {
+//     roomRender.update(roomRender.windows, roomRender.windows[0].id, style.windowStyle.open);
+// }, 5000);
+
+// console.log(ellisOne);
+
+// roomRender.drawRoom(ellisOne);
+
+// roomRender.drawRoom(ellisTwo);
+
+// roomRender.drawRoom(ellisThree);
 
 // console.log(roomRender);
 // console.log(roomRender.windows);
 // console.log(roomRender.slidingDoors);
 
-setTimeout(function() {
-    roomRender.update(roomRender.windows, roomRender.windows[0].id, style.windowStyle.open);
-}, 5000);
 
 registerServiceWorker();
