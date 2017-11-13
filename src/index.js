@@ -1,7 +1,7 @@
 import registerServiceWorker from './registerServiceWorker';
 import Snap from 'snapsvg-cjs';
 import './index.css';
-import {style} from './styles.js';
+import { style } from './styles.js';
 
 // console.log(style);
 
@@ -52,7 +52,7 @@ var roomData = {
                 label: "door",
                 clockwise: false,
                 outline: [
-                    { x: 350, y: 230, radius: 0, curve: "none", index: 0 },
+                    { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
                     { x: 430, y: 80, radius: 40, curve: "concave", index: 2 }
                 ]
@@ -191,7 +191,7 @@ class Floorplan {
 
     drawRoomOutline(points, id, style) {
         // compilePath() takes points and makes the string to pass into path?
-        this.wall = this.paper.path(this.compilePath(points, closed));
+        this.wall = this.paper.path(this.compilePath(points, true));
 
         // give style to shape and assign id to object
         this.wall.attr(style);
@@ -257,7 +257,7 @@ class Floorplan {
 
         // TODO: draw door
         // console.log(room.features.door);
-        // this.drawDoors(room.features.doors, "pink", 3);
+        this.drawDoors(room.features.doors, style.doorStyle.door.default);
 
         // TODO: draw sliding doors
         this.drawSlidingDoors(room.features.slidingDoors, style.doorStyle);
@@ -405,7 +405,7 @@ class Floorplan {
         }
     }
 
-    drawDoor(door, strokeColor, strokeWidth) {
+    drawDoor(door, doorStyle) {
         // Initialize Values
         var doorLines = [];
         var doorLine = [];
@@ -420,13 +420,13 @@ class Floorplan {
         var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
         doorCurve.push(endPoint, pointThree);
         doorLines.push(
-            this.drawLine(this.lineArrayGenerator(doorLine), strokeColor, strokeWidth)
+            this.drawLine(this.lineArrayGenerator(doorLine), doorStyle)
         );
         doorLines.push(
             this.paper.path(this.compilePath(doorCurve, false)).attr({
+                stroke: doorStyle.stroke,
+                strokeWidth: doorStyle.strokeWidth - 3,
                 fill: "transparent",
-                stroke: strokeColor,
-                strokeWidth: strokeWidth - 1,
                 strokeDasharray: "10 10",
                 strokeLinecap: "round"
             })
@@ -555,9 +555,9 @@ class Floorplan {
     }
      */
 
-    drawDoors(doors, strokeColor, strokeWidth) {
+    drawDoors(doors, doorStyle) {
         doors.forEach((door) => {
-            this.drawDoor(door, strokeColor, strokeWidth);
+            this.drawDoor(door, doorStyle);
         });
     }
 
