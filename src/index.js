@@ -50,10 +50,41 @@ var roomData = {
                 type: "door",
                 code: "room-01-door01",
                 label: "door",
+                clockwise: false,
                 outline: [
-                    { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
+                    { x: 350, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
-                    { x: 340, y: 230, radius: 40, curve: "concave", index: 2 }
+                    { x: 430, y: 80, radius: 40, curve: "concave", index: 2 }
+                ]
+            },
+            {
+                type: "door",
+                label: "door-room-02",
+                clockwise: false,
+                outline: [
+                    { x: 110, y: 130, index: 0 },
+                    { x: 150, y: 130, index: 1 },
+                    { x: 130, y: 100, index: 2 }
+                ]
+            },
+            {
+                type: "door",
+                label: "door-room-03",
+                clockwise: false,
+                outline: [
+                    { x: 110, y: 130, index: 0 },
+                    { x: 110, y: 90, index: 1 },
+                    { x: 90, y: 80, index: 2 }
+                ]
+            },
+            {
+                type: "door",
+                label: "door-room-04",
+                clockwise: false,
+                outline: [
+                    { x: 110, y: 130, index: 0 },
+                    { x: 70, y: 130, index: 1 },
+                    { x: 90, y: 170, index: 2 }
                 ]
             }
         ],
@@ -285,7 +316,6 @@ class Floorplan {
         return Math.sqrt( xLength + yLength );
     }
 
-    /*
     testDoorSide(door) {
         return (
             (door[1].x - door[0].x) * (door[2].y - door[0].y)
@@ -293,62 +323,217 @@ class Floorplan {
         );
     }
 
-    testCoordinate(centerPoint, testPoint) {
-        if (centerPoint.x - testPoint.x > 0) {
-            if (centerPoint.y - testPoint.y > 0) {
+    /*
+     testCoordinateZone(centerPoint, endPoint, direction) {
+        if (centerPoint.x - endPoint.x > 0) {
+            if (centerPoint.y - endPoint.y > 0) {
                 return(1);
             } else {
                 return(3);
             }
         } else {
-            if (centerPoint.y - testPoint.y > 0) {
+            if (centerPoint.y - endPoint.y > 0) {
                 return(2);
             } else {
                 return(4);
             }
         }
     }
+    */
+
+    doorCoord(centerPoint, endPoint, direction, axis) {
+        if (centerPoint.x - endPoint.x > 0) {
+            if (centerPoint.y - endPoint.y > 0) { // Door Zone 1
+                if (direction === "concave") { // Clockwise
+                    if (axis === "x") {
+                        return (1);
+                    } else {
+                        return (-1);
+                    }
+                } else { // Counter-Clockwise
+                    if (axis === "x") {
+                        return (-1);
+                    } else {
+                        return (1);
+                    }
+                }
+            } else { // Door is in Zone 3
+                if (direction === "concave") { // Clockwise
+                    if (axis === "x") {
+                        return (-1);
+                    } else {
+                        return (-1);
+                    }
+                } else { // Counter-Clockwise
+                    if (axis === "x") {
+                        return (1);
+                    } else {
+                        return (1);
+                    }
+                }
+            }
+        } else {
+            if (centerPoint.y - endPoint.y > 0) { // Door is in Zone 2
+                if (direction === "concave") { // Clockwise
+                    if (axis === "x") {
+                        return (1);
+                    } else {
+                        return (1);
+                    }
+                } else { // Counter-Clockwise
+                    if (axis === "x") {
+                        return (-1);
+                    } else {
+                        return (-1);
+                    }
+                }
+            } else { // Door is in Zone 4
+                if (direction === "concave") { // Clockwise
+                    if (axis === "x") {
+                        return (-1);
+                    } else {
+                        return (1);
+                    }
+                } else { // Counter-Clockwise
+                    if (axis === "x") {
+                        return (1);
+                    } else {
+                        return (-1);
+                    }
+                }
+            }
+        }
+    }
 
     drawDoor(door, strokeColor, strokeWidth) {
-        console.log(this.testDoorSide(door.outline));
+        // Initialize Values
         var doorLines = [];
         var doorLine = [];
         var doorCurve = [];
-        doorLine.push(door.outline[0], door.outline[1]);
+        var curve = door.clockwise ? "concave" : "convex";
+        var hingePoint = door.outline[0];
+        var endPoint = door.outline[1];
+        doorLine.push(hingePoint, endPoint);
         var radius = this.lineLength(doorLine);
-        var radian1 = Math.PI;
-        var radian2 = Math.PI / 2;
-        var degree1 = radian1 * 180 / Math.PI;
-        var degree2 = radian2 * 180 / Math.PI;
-        console.log(degree1 + " " + degree2);
-        console.log("test" + radius * Math.cos(radian2));
-        var pointThreeX = radius * Math.cos(radian1) + doorLine[0].x - radius * Math.cos(radian2);
-        var pointThreeY = radius * Math.sin(radian1) + doorLine[0].y;
-        var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: "concave"};
-        var lineLengthTest = [];
-        lineLengthTest.push(door.outline[0], pointThree);
-        console.log(this.lineLength(lineLengthTest));
-        console.log(this.testCoordinate(door.outline[0], door.outline[1]));
-        doorCurve.push(door.outline[1], pointThree);
-        // console.log(door.outline[0]);
-        console.log(doorCurve);
-        this.drawCircle(doorLine[0], 5); // Point 1 Hinge
-        // this.drawCircle(doorLine[1], 5); // Point 2
-        // console.log(radius);
-
+        var pointThreeX = hingePoint.x + this.doorCoord(hingePoint, endPoint, curve, "x") * (Math.abs(hingePoint.y - endPoint.y));
+        var pointThreeY = hingePoint.y + this.doorCoord(hingePoint, endPoint, curve, "y") * (Math.abs(hingePoint.x - endPoint.x));
+        var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
+        doorCurve.push(endPoint, pointThree);
         doorLines.push(
             this.drawLine(this.lineArrayGenerator(doorLine), strokeColor, strokeWidth)
         );
         doorLines.push(
             this.paper.path(this.compilePath(doorCurve, false)).attr({
                 fill: "transparent",
-                stroke: "lightgreen",
-                strokeWidth: strokeWidth
+                stroke: strokeColor,
+                strokeWidth: strokeWidth - 1,
+                strokeDasharray: "10 10",
+                strokeLinecap: "round"
             })
-        )
+        );
         this.doors.push(doorLines);
-     } */
+     }
 
+    // ################################################################################
+    // TODO: Even Snazzier door
+    // Takes in an specific angle for the door, Default being 90 degrees
+    // ################################################################################
+    /*drawDoorWithAngle(door, angle, strokeColor, strokeWidth) {
+        // Testing with Door Colors
+        if (door.label === "door-room-01") {
+            strokeColor = "green";
+        } else if (door.label === "door-room-02") {
+            strokeColor = "magenta";
+        } else if (door.label === "door-room-03") {
+            strokeColor = "blue";
+        } else if (door.label === "door-room-04") {
+            // strokeColor = "transparent";
+            // strokeWidth = 0;
+        } else {
+            strokeColor = "grey";
+        }
+
+        // Log to check room and color
+        console.log(door.label);
+        console.log(strokeColor);
+
+
+        // Initialize Values
+        var doorLines = [];
+        var doorLine = [];
+        var doorCurve = [];
+        var curve = "concave";
+        var hingePoint = door.outline[0];
+        var endPoint = door.outline[1];
+        doorLine.push(hingePoint, endPoint);
+        var radius = this.lineLength(doorLine);
+        var radian1 = 0;
+        var radian2 = 0;
+
+        if (hingePoint.y === endPoint.y) {
+            radian1 = Math.PI / 2;
+        } else if (hingePoint.x === endPoint.x){
+            radian1 = Math.PI;
+        }
+
+        if (clockwise) {
+            console.log("test");
+        }
+        console.log(this.testDoorSide(door.outline));
+        if (this.testDoorSide(door.outline) < 0) {
+            curve = "convex";
+            if (hingePoint.y < endPoint.y) {
+                radian1 = radian1 + Math.PI;
+            } else if (hingePoint.x < endPoint.x){
+                radian1 = radian1 - Math.PI;
+            }
+        }
+        console.log(curve);
+
+        // radian2 must be calculated if both points have a different x value
+        // var radian2 = Math.PI / 2;
+
+        // var degree1 = radian1 * 180 / Math.PI; // Checking what each value is in degrees
+        // var degree2 = radian2 * 180 / Math.PI;
+        // console.log(radian1);
+        var pointThreeX = radius * Math.cos(radian1) + doorLine[0].x;
+        var pointThreeY = radius * Math.sin(radian1) + doorLine[0].y;
+        var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
+
+        // var lineLengthTest = []; // Testing to see whether the line is the correct length 
+        // lineLengthTest.push(hingePoint, pointThree); // (correct length should be the length of the radius)
+
+        doorCurve.push(endPoint, pointThree);
+
+        // console.log(degree1 + " " + degree2);
+        // console.log("test" + radius * Math.cos(radian2));
+        // console.log(this.lineLength(lineLengthTest));
+        // console.log(this.testCoordinate(door.outline[0], door.outline[1]));
+        // console.log(door.outline[0]);
+        // console.log(doorCurve);
+        this.drawCircle(doorLine[0], 5); // Point 1 Hinge
+        // this.drawCircle(doorLine[1], 5); // Point 2
+        this.drawCircle(door.outline[2], 5, strokeColor); // Point that picks the side.
+        // console.log(radius);
+        doorLines.push(
+            this.drawLine(this.lineArrayGenerator(doorLine), strokeColor, strokeWidth)
+        );
+        doorLines.push(
+            this.paper.path(this.compilePath(doorCurve, false)).attr({
+                fill: "transparent",
+                stroke: strokeColor,
+                strokeWidth: strokeWidth - 1,
+                strokeDasharray: "10 10",
+                strokeLinecap: "round"
+            })
+        );
+        this.doors.push(doorLines);
+     }*/
+
+    /*
+    // #########################################################################
+    // Original Draw Door
+    // #########################################################################
     drawDoor(door, strokeColor, strokeWidth) {
         var doorLines = [];
         var doorLine = [];
@@ -367,8 +552,8 @@ class Floorplan {
             })
         );
         this.doors.push(doorLines);
-        console.log(this.doors);
     }
+     */
 
     drawDoors(doors, strokeColor, strokeWidth) {
         doors.forEach((door) => {
@@ -417,8 +602,8 @@ class Floorplan {
         }
     }
 
-    drawCircle(centerPoint, radius) {
-        this.paper.circle(centerPoint.x, centerPoint.y, radius);
+    drawCircle(centerPoint, radius, fill) {
+        return (this.paper.circle(centerPoint.x, centerPoint.y, radius).attr({ fill: fill}));
     }
 }
 
