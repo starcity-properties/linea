@@ -1,6 +1,4 @@
-export var ellisOne;
-
-var ellisOne = {
+export var ellisOne = {
     unit: {
         name: "room-01",
         code: "ellis-room-01",
