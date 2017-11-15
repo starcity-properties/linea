@@ -1,14 +1,12 @@
 // Styles to be used in rendering our floorplans
 
-export var style;
-
-var style = {
+export var style = {
     roomOutline: {
         default: {
             stroke: "#000000",
             strokeWidth: 8,
             fill: "#f4e4d7",
-            fillOpacity: 1
+            fillOpacity: .5
         },
     },
     interiorWalls: {
@@ -27,7 +25,7 @@ var style = {
             fillOpacity: 1
         },
         open: {
-            stroke: "yellow", // need hex?
+            stroke: "yellow",
             strokeWidth: 6,
             fill: "none",
             fillOpacity: 1
