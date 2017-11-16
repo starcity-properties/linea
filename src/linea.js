@@ -76,7 +76,7 @@ export default class Floorplan {
         this.wall.id = id;
     }
 
-    pointArrayGenerator(point) {
+    generatePointArray(point) {
         var pointArray = [];
 
         pointArray.push(point.x, point.y);
@@ -84,11 +84,11 @@ export default class Floorplan {
     }
 
     // takes outline object and created array of points to be fed into polyline draw
-    lineArrayGenerator(outline) {
+    generateLineArray(outline) {
         var linePoints = [];
 
         outline.forEach((point) => {
-            linePoints.push(this.pointArrayGenerator(point));
+            linePoints.push(this.generatePointArray(point));
         });
         return linePoints;
     }
@@ -98,7 +98,7 @@ export default class Floorplan {
     }
 
     drawWindow(window, style) {
-        var points = this.lineArrayGenerator(window.outline);
+        var points = this.generateLineArray(window.outline);
         this.windows.push(this.drawLine(points, style));
     }
 
@@ -110,7 +110,7 @@ export default class Floorplan {
     }
 
     drawInteriorWall(wall, style) {
-        var points = this.lineArrayGenerator(wall.outline);
+        var points = this.generateLineArray(wall.outline);
         this.interiorWalls.push(this.drawLine(points, style));
     }
 
@@ -140,10 +140,9 @@ export default class Floorplan {
 
     update(feature, id, attrObject) {
         // TODO: updating outline or features. Events, moving furniture around, etc
-        // what if the feature only has one item?? ie it's not an array...
         feature.forEach((item) => {
             if (item.id === id) {
-                console.log("updating");
+                // console.log("updating");
                 item.attr(attrObject);
             }
         });
@@ -164,8 +163,8 @@ export default class Floorplan {
         doorSegment.push(slidingDoor.outline[0], slidingDoor.outline[1]);
         dottedSegment.push(slidingDoor.outline[1], slidingDoor.outline[2]);
         slidingDoorLines.push(
-            this.drawLine(this.lineArrayGenerator(doorSegment), style.door.default),
-            this.drawLine(this.lineArrayGenerator(dottedSegment), style.projection.default)
+            this.drawLine(this.generateLineArray(doorSegment), style.door.default),
+            this.drawLine(this.generateLineArray(dottedSegment), style.projection.default)
         );
         this.slidingDoors.push(slidingDoorLines);
     }
@@ -189,28 +188,51 @@ export default class Floorplan {
         return Math.sqrt( xLength + yLength );
     }
 
-    testDoorSide(door) {
-        return (door[1].x - door[0].x) * (door[2].y - door[0].y)
-            - ((door[1].y - door[0].y) * (door[2].x - door[0].x));
+    doorCoordBaseAngle(centerPoint, endPoint, direction) {
+        if (centerPoint.x - endPoint.x === 0) {
+            if (centerPoint.y - endPoint.y > 0) {
+                return 3 * Math.PI / 2;
+            } else {
+                return Math.PI / 2;
+            }
+        }
+        if (centerPoint.y - endPoint.y === 0) {
+            if (centerPoint.x - endPoint.x > 0) {
+                return Math.PI;
+            } else {
+                return 0;
+            }
+        }
+        if (centerPoint.x - endPoint.x > 0) {
+            if (centerPoint.y - endPoint.y > 0) {
+                if (direction === "concave") {
+                    return Math.PI;
+                } else {
+                    return 3 * Math.PI / 2;
+                }
+            } else {
+                if (direction === "concave") {
+                    return Math.PI / 2;
+                } else {
+                    return Math.PI;
+                }
+            }
+        } else {
+            if (centerPoint.y - endPoint.y > 0) {
+                if (direction === "concave") {
+                    return 3 * Math.PI / 2;
+                } else {
+                    return 0;
+                }
+            } else {
+                if (direction === "concave") {
+                    return 0;
+                } else {
+                    return Math.PI / 2;
+                }
+            }
+        }
     }
-
-    /*
-     testCoordinateZone(centerPoint, endPoint, direction) {
-     if (centerPoint.x - endPoint.x > 0) {
-     if (centerPoint.y - endPoint.y > 0) {
-     return1;
-     } else {
-     return(3);
-     }
-     } else {
-     if (centerPoint.y - endPoint.y > 0) {
-     return(2);
-     } else {
-     return(4);
-     }
-     }
-     }
-     */
 
     doorCoord(centerPoint, endPoint, direction, axis) {
         if (centerPoint.x - endPoint.x > 0) {
@@ -264,18 +286,49 @@ export default class Floorplan {
         // Initialize Values
         var doorLines = [];
         var doorLine = [];
+        var doorStop = [];
         var doorCurve = [];
         var curve = door.clockwise ? "concave" : "convex";
         var hingePoint = door.outline[0];
         var endPoint = door.outline[1];
         doorLine.push(hingePoint, endPoint);
         var radius = this.lineLength(doorLine);
-        var pointThreeX = hingePoint.x + this.doorCoord(hingePoint, endPoint, curve, "x") * (Math.abs(hingePoint.y - endPoint.y));
-        var pointThreeY = hingePoint.y + this.doorCoord(hingePoint, endPoint, curve, "y") * (Math.abs(hingePoint.x - endPoint.x));
+        var pointThreeX = 0;
+        var pointThreeY = 0;
+        var baseAngle = 0;
+        var supportAngle = 0;
+        var doorAngle = 0;
+        var hasAngle = door.angleDegrees !== undefined ? door.angleDegrees : false;
+        if (!hasAngle) {
+            pointThreeX = hingePoint.x + this.doorCoord(hingePoint, endPoint, curve, "x") * (Math.abs(hingePoint.y - endPoint.y));
+            pointThreeY = hingePoint.y + this.doorCoord(hingePoint, endPoint, curve, "y") * (Math.abs(hingePoint.x - endPoint.x));
+        } else {
+            baseAngle = this.doorCoordBaseAngle(hingePoint, endPoint, curve);
+            if (hingePoint.x !== endPoint.x && hingePoint.y !== endPoint.y) {
+                if (baseAngle === Math.PI || baseAngle === 0) {
+                    supportAngle = Math.acos(this.lineLength([hingePoint,{x: endPoint.x, y: hingePoint.y}]) / radius);
+                } else {
+                    supportAngle = Math.acos(this.lineLength([hingePoint,{x: hingePoint.x, y: endPoint.y}]) / radius);
+                }
+            }
+            doorAngle = curve === "concave"
+                ? baseAngle + Snap.rad(hasAngle) + supportAngle
+                : baseAngle - Snap.rad(hasAngle) - supportAngle;
+            if (doorAngle > 2 * Math.PI) {
+                doorAngle = doorAngle % (2 * Math.PI);
+            } else if (doorAngle < 0) {
+                doorAngle = 2 * Math.PI - (Math.abs(doorAngle) % (2 * Math.PI));
+            }
+            pointThreeX = radius * Math.cos(doorAngle) + hingePoint.x;
+            pointThreeY = radius * Math.sin(doorAngle) + hingePoint.y;
+        }
+
         var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
         doorCurve.push(endPoint, pointThree);
+        doorStop.push(hingePoint, pointThree);
         doorLines.push(
-            this.drawLine(this.lineArrayGenerator(doorLine), doorStyle)
+            this.drawLine(this.generateLineArray(doorLine), doorStyle),
+            this.drawLine(this.generateLineArray(doorStop), doorStyle)
         );
         doorLines.push(
             this.paper.path(this.compilePath(doorCurve, false)).attr({
@@ -288,102 +341,6 @@ export default class Floorplan {
         );
         this.doors.push(doorLines);
     }
-
-    // ################################################################################
-    // TODO: Even Snazzier door
-    // Takes in an specific angle for the door, Default being 90 degrees
-    // ################################################################################
-    /*drawDoorWithAngle(door, angle, strokeColor, strokeWidth) {
-     // Testing with Door Colors
-     if (door.label === "door-room-01") {
-     strokeColor = "green";
-     } else if (door.label === "door-room-02") {
-     strokeColor = "magenta";
-     } else if (door.label === "door-room-03") {
-     strokeColor = "blue";
-     } else if (door.label === "door-room-04") {
-     // strokeColor = "transparent";
-     // strokeWidth = 0;
-     } else {
-     strokeColor = "grey";
-     }
-
-     // Log to check room and color
-     console.log(door.label);
-     console.log(strokeColor);
-
-
-     // Initialize Values
-     var doorLines = [];
-     var doorLine = [];
-     var doorCurve = [];
-     var curve = "concave";
-     var hingePoint = door.outline[0];
-     var endPoint = door.outline[1];
-     doorLine.push(hingePoint, endPoint);
-     var radius = this.lineLength(doorLine);
-     var radian1 = 0;
-     var radian2 = 0;
-
-     if (hingePoint.y === endPoint.y) {
-     radian1 = Math.PI / 2;
-     } else if (hingePoint.x === endPoint.x){
-     radian1 = Math.PI;
-     }
-
-     if (clockwise) {
-     console.log("test");
-     }
-     console.log(this.testDoorSide(door.outline));
-     if (this.testDoorSide(door.outline) < 0) {
-     curve = "convex";
-     if (hingePoint.y < endPoint.y) {
-     radian1 = radian1 + Math.PI;
-     } else if (hingePoint.x < endPoint.x){
-     radian1 = radian1 - Math.PI;
-     }
-     }
-     console.log(curve);
-
-     // radian2 must be calculated if both points have a different x value
-     // var radian2 = Math.PI / 2;
-
-     // var degree1 = radian1 * 180 / Math.PI; // Checking what each value is in degrees
-     // var degree2 = radian2 * 180 / Math.PI;
-     // console.log(radian1);
-     var pointThreeX = radius * Math.cos(radian1) + doorLine[0].x;
-     var pointThreeY = radius * Math.sin(radian1) + doorLine[0].y;
-     var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
-
-     // var lineLengthTest = []; // Testing to see whether the line is the correct length
-     // lineLengthTest.push(hingePoint, pointThree); // (correct length should be the length of the radius)
-
-     doorCurve.push(endPoint, pointThree);
-
-     // console.log(degree1 + " " + degree2);
-     // console.log("test" + radius * Math.cos(radian2));
-     // console.log(this.lineLength(lineLengthTest));
-     // console.log(this.testCoordinate(door.outline[0], door.outline[1]));
-     // console.log(door.outline[0]);
-     // console.log(doorCurve);
-     this.drawCircle(doorLine[0], 5); // Point 1 Hinge
-     // this.drawCircle(doorLine[1], 5); // Point 2
-     this.drawCircle(door.outline[2], 5, strokeColor); // Point that picks the side.
-     // console.log(radius);
-     doorLines.push(
-     this.drawLine(this.lineArrayGenerator(doorLine), strokeColor, strokeWidth)
-     );
-     doorLines.push(
-     this.paper.path(this.compilePath(doorCurve, false)).attr({
-     fill: "transparent",
-     stroke: strokeColor,
-     strokeWidth: strokeWidth - 1,
-     strokeDasharray: "10 10",
-     strokeLinecap: "round"
-     })
-     );
-     this.doors.push(doorLines);
-     }*/
 
     drawDoors(doors, doorStyle) {
         doors.forEach((door) => {
@@ -407,9 +364,9 @@ export default class Floorplan {
                     }
                 ]};
             if (i % 5 === 0) {
-                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), {stroke: "#cccccc", strokeWidth: 1}));
+                this.majorGrid.push(this.drawLine(this.generateLineArray(horizontalLines.outline), {stroke: "#cccccc", strokeWidth: 1}));
             } else {
-                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(horizontalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
+                this.minorGrid.push(this.drawLine(this.generateLineArray(horizontalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
             }
         }
         for(var j = 0; j < xMax - 1; j++) {
@@ -425,9 +382,9 @@ export default class Floorplan {
                     }
                 ]};
             if (j % 5 === 0) {
-                this.majorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), {stroke: "#ccc", strokeWidth: 1}));
+                this.majorGrid.push(this.drawLine(this.generateLineArray(verticalLines.outline), {stroke: "#ccc", strokeWidth: 1}));
             } else {
-                this.minorGrid.push(this.drawLine(this.lineArrayGenerator(verticalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
+                this.minorGrid.push(this.drawLine(this.generateLineArray(verticalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
             }
         }
     }
