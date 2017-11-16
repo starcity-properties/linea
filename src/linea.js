@@ -131,7 +131,7 @@ export default class Floorplan {
         this.drawWindows(room.features.windows, style.windowStyle.default);
 
         // console.log(room.features.door);
-        this.drawDoors(room.features.doors, style.doorStyle.door.default);
+        this.drawDoors(room.features.doors, style.doorStyle);
 
         this.drawSlidingDoors(room.features.slidingDoors, style.doorStyle);
 
@@ -295,6 +295,7 @@ export default class Floorplan {
         var radius = this.lineLength(doorLine);
         var pointThreeX = 0;
         var pointThreeY = 0;
+        var pointThree = {};
         var baseAngle = 0;
         var supportAngle = 0;
         var doorAngle = 0;
@@ -323,21 +324,15 @@ export default class Floorplan {
             pointThreeY = radius * Math.sin(doorAngle) + hingePoint.y;
         }
 
-        var pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
+        pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
         doorCurve.push(endPoint, pointThree);
         doorStop.push(hingePoint, pointThree);
         doorLines.push(
-            this.drawLine(this.generateLineArray(doorLine), doorStyle),
-            this.drawLine(this.generateLineArray(doorStop), doorStyle)
+            this.drawLine(this.generateLineArray(doorLine), doorStyle.door.default),
+            this.drawLine(this.generateLineArray(doorStop), doorStyle.doorStop.default)
         );
         doorLines.push(
-            this.paper.path(this.compilePath(doorCurve, false)).attr({
-                stroke: doorStyle.stroke,
-                strokeWidth: doorStyle.strokeWidth - 3,
-                fill: "transparent",
-                strokeDasharray: "10 10",
-                strokeLinecap: "round"
-            })
+            this.paper.path(this.compilePath(doorCurve, false)).attr(doorStyle.projection.default)
         );
         this.doors.push(doorLines);
     }

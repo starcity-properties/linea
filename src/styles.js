@@ -7,7 +7,7 @@ export var style = {
             strokeWidth: 8,
             fill: "#f4e4d7",
             fillOpacity: .5
-        },
+        }
     },
     interiorWalls: {
         default: {
@@ -15,7 +15,7 @@ export var style = {
             strokeWidth: 8,
             fill: "#f4e4d7",
             fillOpacity: 1
-        },
+        }
     },
     windowStyle: {
         default: {
@@ -63,9 +63,23 @@ export var style = {
                 strokeDasharray: "0",
                 strokeLinecap: "round"
             }
+        },
+        doorStop: {
+            default: {
+                stroke: "#c1272d",
+                strokeWidth: 1,
+                fill: "none",
+                fillOpacity: 1
+            },
+            open :{
+                stroke: "#ff00ff",
+                strokeWidth: 1,
+                fill: "none",
+                fillOpacity: 1
+            }
         }
     }
-}
+};
 
 
 
