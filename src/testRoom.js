@@ -43,6 +43,7 @@ export var testRoom = {
                 type: "door",
                 code: "room-01-door01",
                 label: "door",
+                angleDegrees: 15,
                 clockwise: false,
                 outline: [
                     { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
@@ -53,6 +54,7 @@ export var testRoom = {
             {
                 type: "door",
                 label: "door-room-02",
+                angleDegrees: 30,
                 clockwise: false,
                 outline: [
                     { x: 110, y: 130, index: 0 },
@@ -63,7 +65,8 @@ export var testRoom = {
             {
                 type: "door",
                 label: "door-room-03",
-                clockwise: false,
+                angleDegrees: 45,
+                clockwise: true,
                 outline: [
                     { x: 110, y: 130, index: 0 },
                     { x: 110, y: 90, index: 1 },
