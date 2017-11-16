@@ -142,7 +142,7 @@ export default class Floorplan {
         // TODO: updating outline or features. Events, moving furniture around, etc
         feature.forEach((item) => {
             if (item.id === id) {
-                console.log("updating");
+                // console.log("updating");
                 item.attr(attrObject);
             }
         });
@@ -314,11 +314,9 @@ export default class Floorplan {
             doorAngle = curve === "concave"
                 ? baseAngle + Snap.rad(hasAngle) + supportAngle
                 : baseAngle - Snap.rad(hasAngle) - supportAngle;
-            console.log(Snap.deg(doorAngle));
             if (doorAngle > 2 * Math.PI) {
                 doorAngle = doorAngle % (2 * Math.PI);
             } else if (doorAngle < 0) {
-                console.log(Math.abs(doorAngle) % (2 * Math.PI));
                 doorAngle = 2 * Math.PI - (Math.abs(doorAngle) % (2 * Math.PI));
             }
             pointThreeX = radius * Math.cos(doorAngle) + hingePoint.x;
