@@ -1,6 +1,16 @@
 // Styles to be used in rendering our floorplans
 
 export var style = {
+    gridStyle: {
+        majorGridLine: {
+            stroke: "#cccccc",
+            strokeWidth: 1
+        },
+        minorGridLine: {
+            stroke: "#eaeaea",
+            strokeWidth: 1,
+        }
+    },
     roomOutline: {
         default: {
             stroke: "#000000",
@@ -22,7 +32,8 @@ export var style = {
             stroke: "#f9f9f9",
             strokeWidth: 6,
             fill: "none",
-            fillOpacity: 1
+            fillOpacity: 1,
+            strokeLinecap: "round"
         },
         open: {
             stroke: "yellow",
@@ -77,6 +88,26 @@ export var style = {
                 fill: "none",
                 fillOpacity: 1
             }
+        }
+    },
+    furniture: {
+        bed: {
+            stroke: "black",
+            strokeWidth: 1,
+            fill: "none",
+            fillOpacity: 1
+        },
+        dresser: {
+            stroke: "grey",
+            strokeWidth: 1,
+            fill: "none",
+            fillOpacity: 1
+        },
+        nightTable: {
+            stroke: "grey",
+            strokeWidth: 1,
+            fill: "none",
+            fillOpacity: 1
         }
     }
 };
