@@ -3,7 +3,8 @@ export var testRoom = {
         name: "room-01",
         code: "mission-room-01",
         rate: 2100,
-        number: 1
+        number: 1,
+        scale: 1
     },
     room: {
         outline: [
@@ -43,23 +44,21 @@ export var testRoom = {
                 type: "door",
                 code: "room-01-door01",
                 label: "door",
-                angleDegrees: 15,
+                angleDegrees: 45,
                 clockwise: false,
                 outline: [
                     { x: 380, y: 230, radius: 0, curve: "none", index: 0 },
                     { x: 380, y: 270, radius: 0, curve: "none", index: 1 },
-                    { x: 430, y: 80, radius: 40, curve: "concave", index: 2 }
                 ]
             },
             {
                 type: "door",
                 label: "door-room-02",
                 angleDegrees: 30,
-                clockwise: false,
+                clockwise: true,
                 outline: [
-                    { x: 110, y: 130, index: 0 },
-                    { x: 150, y: 130, index: 1 },
-                    { x: 130, y: 100, index: 2 }
+                    { x: 140, y: 10, index: 0 },
+                    { x: 180, y: 10, index: 1 },
                 ]
             },
             {
@@ -70,7 +69,6 @@ export var testRoom = {
                 outline: [
                     { x: 110, y: 130, index: 0 },
                     { x: 110, y: 90, index: 1 },
-                    { x: 90, y: 80, index: 2 }
                 ]
             },
             {
@@ -78,9 +76,8 @@ export var testRoom = {
                 label: "door-room-04",
                 clockwise: false,
                 outline: [
-                    { x: 110, y: 130, index: 0 },
-                    { x: 70, y: 130, index: 1 },
-                    { x: 90, y: 170, index: 2 }
+                    { x: 80, y: 130, index: 0 },
+                    { x: 40, y: 130, index: 1 },
                 ]
             }
         ],
@@ -114,7 +111,57 @@ export var testRoom = {
                     { x: 10, y: 130, radius: 0, curve: "none", index: 0 },
                     { x: 220, y: 130, radius: 0, curve: "none", index: 1 },
                 ]
+            },
+            {
+                type: "interiorWall",
+                code: "room-01-interiorWall03",
+                label: "interior wall",
+                outline: [
+                    { x: 110, y: 10, index: 0 },
+                    { x: 110, y: 90, index: 1 }
+                ]
             }
-        ]
+        ],
+        furniture: {
+            beds:[
+                {
+                    type: "queen",
+                    code: "room-01-bed01",
+                    label: "Queen Bed",
+                    outline: [
+                        { x: 30, y: 270, index: 0 },
+                        { x: 30, y: 210, index: 1 },
+                        { x: 110, y: 210, index: 2 },
+                        { x: 110, y: 270, index: 3 }
+                    ]
+                }
+            ],
+            dressers: [
+                {
+                    type: "dresser",
+                    code: "room-01-dresser01",
+                    label: "Dresser",
+                    outline: [
+                        { x: 90, y: 170, index: 0 },
+                        { x: 90, y: 140, index: 1 },
+                        { x: 180, y: 140, index: 2 },
+                        { x: 180, y: 170, index: 3 }
+                    ]
+                }
+            ],
+            nightTables: [
+                {
+                    type: "nightTable",
+                    code: "room-01-nightTable01",
+                    label: "NightTable",
+                    outline: [
+                        { x: 30, y: 175, index: 0 },
+                        { x: 30, y: 205, index: 0 },
+                        { x: 60, y: 205, index: 0 },
+                        { x: 60, y: 175, index: 1 }
+                    ]
+                }
+            ]
+        }
     }
-}
+};

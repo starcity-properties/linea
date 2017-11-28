@@ -21,7 +21,7 @@ export default class Floorplan {
         this.minorGrid = [];
 
         // Initialize walls
-        this.wall = [];
+        this.walls = [];
 
         // Initialize interiorWalls
         this.interiorWalls = [];
@@ -41,7 +41,6 @@ export default class Floorplan {
 
     // Function to create the string to draw path
     compilePath(points, closed) {
-        // console.log(points);
         var path = [];
 
         // Iterates through each point object to create path
@@ -67,13 +66,16 @@ export default class Floorplan {
         return path.join(" ");
     }
 
-    drawRoomOutline(points, id, style) {
+    drawPathOutline(points, closed, outlineStyle) {
+        return this.paper.path(this.compilePath(points, closed)).attr(outlineStyle);
+    }
+
+    drawRoomOutline(points, id, outlineStyle) {
         // compilePath() takes points and makes the string to pass into path?
-        this.wall = this.paper.path(this.compilePath(points, true));
+        var lastItem = this.walls.push(this.drawPathOutline(points, true, outlineStyle)) - 1;
 
         // give style to shape and assign id to object
-        this.wall.attr(style);
-        this.wall.id = id;
+        this.walls[lastItem].id = id;
     }
 
     generatePointArray(point) {
@@ -93,30 +95,30 @@ export default class Floorplan {
         return linePoints;
     }
 
-    drawLine(points, style) {
-        return this.paper.polyline(points).attr(style);
+    drawLine(points, lineStyle) {
+        return this.paper.polyline(points).attr(lineStyle);
     }
 
-    drawWindow(window, style) {
+    drawWindow(window, windowStyle) {
         var points = this.generateLineArray(window.outline);
-        this.windows.push(this.drawLine(points, style));
+        this.windows.push(this.drawLine(points, windowStyle));
     }
 
-    drawWindows(windows, style) {
+    drawWindows(windows, windowStyle) {
         windows.forEach((window, index) => {
-            this.drawWindow(window, style);
+            this.drawWindow(window, windowStyle);
             this.windows[index].id = window.code;
         });
     }
 
-    drawInteriorWall(wall, style) {
+    drawInteriorWall(wall, wallStyle) {
         var points = this.generateLineArray(wall.outline);
-        this.interiorWalls.push(this.drawLine(points, style));
+        this.interiorWalls.push(this.drawLine(points, wallStyle));
     }
 
-    drawInteriorWalls(walls, style) {
+    drawInteriorWalls(walls, wallStyle) {
         walls.forEach((wall, index) => {
-            this.drawInteriorWall(wall, style);
+            this.drawInteriorWall(wall, wallStyle);
             this.interiorWalls[index].id = wall.code;
         });
     }
@@ -130,19 +132,17 @@ export default class Floorplan {
 
         this.drawWindows(room.features.windows, style.windowStyle.default);
 
-        // console.log(room.features.door);
         this.drawDoors(room.features.doors, style.doorStyle);
 
         this.drawSlidingDoors(room.features.slidingDoors, style.doorStyle);
 
-        // TODO: draw furniture
+        this.drawFurniture(room.features.furniture, style.furniture, room.unit.scale);
     }
 
     update(feature, id, attrObject) {
         // TODO: updating outline or features. Events, moving furniture around, etc
         feature.forEach((item) => {
             if (item.id === id) {
-                // console.log("updating");
                 item.attr(attrObject);
             }
         });
@@ -156,82 +156,36 @@ export default class Floorplan {
 
     }
 
-    drawSlidingDoor(slidingDoor, style) {
+    drawSlidingDoor(slidingDoor, slidingDoorStyle) {
         var slidingDoorLines = [];
         var doorSegment= [];
         var dottedSegment = [];
         doorSegment.push(slidingDoor.outline[0], slidingDoor.outline[1]);
         dottedSegment.push(slidingDoor.outline[1], slidingDoor.outline[2]);
         slidingDoorLines.push(
-            this.drawLine(this.generateLineArray(doorSegment), style.door.default),
-            this.drawLine(this.generateLineArray(dottedSegment), style.projection.default)
+            this.drawLine(this.generateLineArray(doorSegment), slidingDoorStyle.door.default),
+            this.drawLine(this.generateLineArray(dottedSegment), slidingDoorStyle.projection.default)
         );
         this.slidingDoors.push(slidingDoorLines);
     }
 
-    drawSlidingDoors(slidingDoors, style) {
+    drawSlidingDoors(slidingDoors, slidingDoorStyle) {
         slidingDoors.forEach((item, index) => {
-            this.drawSlidingDoor(item, style);
+            this.drawSlidingDoor(item, slidingDoorStyle);
             this.slidingDoors[index].id = item.code;
         });
     }
 
-    lineLength(linePoints) {
+    lineLength(pointA, pointB) {
         var xLength= 0;
         var yLength= 0;
-        xLength= linePoints[0].x - linePoints[1].x;
+        xLength= pointA.x - pointB.x;
         xLength= xLength * xLength;
 
-        yLength= linePoints[0].y - linePoints[1].y;
+        yLength= pointA.y - pointB.y;
         yLength= yLength * yLength;
 
         return Math.sqrt( xLength + yLength );
-    }
-
-    doorCoordBaseAngle(centerPoint, endPoint, direction) {
-        if (centerPoint.x - endPoint.x === 0) {
-            if (centerPoint.y - endPoint.y > 0) {
-                return 3 * Math.PI / 2;
-            } else {
-                return Math.PI / 2;
-            }
-        }
-        if (centerPoint.y - endPoint.y === 0) {
-            if (centerPoint.x - endPoint.x > 0) {
-                return Math.PI;
-            } else {
-                return 0;
-            }
-        }
-        if (centerPoint.x - endPoint.x > 0) {
-            if (centerPoint.y - endPoint.y > 0) {
-                if (direction === "concave") {
-                    return Math.PI;
-                } else {
-                    return 3 * Math.PI / 2;
-                }
-            } else {
-                if (direction === "concave") {
-                    return Math.PI / 2;
-                } else {
-                    return Math.PI;
-                }
-            }
-        } else {
-            if (centerPoint.y - endPoint.y > 0) {
-                if (direction === "concave") {
-                    return 3 * Math.PI / 2;
-                } else {
-                    return 0;
-                }
-            } else {
-                if (direction === "concave") {
-                    return 0;
-                } else {
-                    return Math.PI / 2;
-                }
-            }
-        }
     }
 
     doorCoord(centerPoint, endPoint, direction, axis) {
@@ -291,12 +245,11 @@ export default class Floorplan {
         var curve = door.clockwise ? "concave" : "convex";
         var hingePoint = door.outline[0];
         var endPoint = door.outline[1];
-        doorLine.push(hingePoint, endPoint);
-        var radius = this.lineLength(doorLine);
+        var radius = this.lineLength(hingePoint, endPoint);
         var pointThreeX = 0;
         var pointThreeY = 0;
         var pointThree = {};
-        var baseAngle = 0;
+        var baseAngle = Snap.rad(Snap.angle(hingePoint.x, hingePoint.y, endPoint.x, endPoint.y)) - Math.PI;
         var supportAngle = 0;
         var doorAngle = 0;
         var hasAngle = door.angleDegrees !== undefined ? door.angleDegrees : false;
@@ -304,7 +257,6 @@ export default class Floorplan {
             pointThreeX = hingePoint.x + this.doorCoord(hingePoint, endPoint, curve, "x") * (Math.abs(hingePoint.y - endPoint.y));
             pointThreeY = hingePoint.y + this.doorCoord(hingePoint, endPoint, curve, "y") * (Math.abs(hingePoint.x - endPoint.x));
         } else {
-            baseAngle = this.doorCoordBaseAngle(hingePoint, endPoint, curve);
             if (hingePoint.x !== endPoint.x && hingePoint.y !== endPoint.y) {
                 if (baseAngle === Math.PI || baseAngle === 0) {
                     supportAngle = Math.acos(this.lineLength([hingePoint,{x: endPoint.x, y: hingePoint.y}]) / radius);
@@ -323,16 +275,14 @@ export default class Floorplan {
             pointThreeX = radius * Math.cos(doorAngle) + hingePoint.x;
             pointThreeY = radius * Math.sin(doorAngle) + hingePoint.y;
         }
-
         pointThree = { x: pointThreeX, y: pointThreeY, radius: radius, curve: curve };
+        doorLine.push(hingePoint, endPoint);
         doorCurve.push(endPoint, pointThree);
         doorStop.push(hingePoint, pointThree);
         doorLines.push(
             this.drawLine(this.generateLineArray(doorLine), doorStyle.door.default),
-            this.drawLine(this.generateLineArray(doorStop), doorStyle.doorStop.default)
-        );
-        doorLines.push(
-            this.paper.path(this.compilePath(doorCurve, false)).attr(doorStyle.projection.default)
+            this.drawLine(this.generateLineArray(doorStop), doorStyle.doorStop.default),
+            this.paper.path(this.compilePath(doorCurve)).attr(doorStyle.projection.default)
         );
         this.doors.push(doorLines);
     }
@@ -343,7 +293,77 @@ export default class Floorplan {
         });
     }
 
-    drawGrid(unitLength, majorColor, minorColor) {
+    lineMidPoint(pointA, pointB) {
+        var midPoint = {};
+        midPoint.x = (pointA.x + pointB.x) / 2;
+        midPoint.y = (pointA.y + pointB.y) / 2;
+        return midPoint;
+    }
+
+    drawBed(bed, bedStyle, pillows) {
+        var bedObjs = [];
+        var topLeftPoint = bed.outline[0];
+        var topRightPoint = bed.outline[1];
+        var bottomRightPoint = bed.outline[2];
+        var headBoardLength = this.lineLength(topLeftPoint, topRightPoint);
+        var halfLength = headBoardLength / 2;
+        var quarterLength = halfLength / 2;
+        var sideLength = this.lineLength(topRightPoint, bottomRightPoint);
+        var topPillowBuffer = .025 * sideLength;
+        var centerPoint = this.lineMidPoint(topLeftPoint, bottomRightPoint);
+        var pillowOnePoints = [
+            { x: topLeftPoint.x + quarterLength - 13, y: topLeftPoint.y + topPillowBuffer },
+            { x: topLeftPoint.x + quarterLength + 13, y: topLeftPoint.y + topPillowBuffer },
+            { x: topLeftPoint.x + quarterLength + 13, y:topLeftPoint.y + 20 + topPillowBuffer },
+            { x: topLeftPoint.x + quarterLength - 13, y: topLeftPoint.y + 20 + topPillowBuffer }];
+        var pillowTwoPoints = [
+            { x: topLeftPoint.x + halfLength + quarterLength - 13, y: topLeftPoint.y + topPillowBuffer },
+            { x: topLeftPoint.x + halfLength + quarterLength + 13, y: topLeftPoint.y + topPillowBuffer },
+            { x: topLeftPoint.x + halfLength + quarterLength + 13, y:topLeftPoint.y + 20 + topPillowBuffer },
+            { x: topLeftPoint.x + halfLength + quarterLength - 13, y: topLeftPoint.y + 20 + topPillowBuffer }];
+        bedObjs.push(
+            this.paper.text(centerPoint.x, centerPoint.y, bed.label).attr({textAnchor: "middle", alignmentBaseline: "middle", fontSize: 8}),
+            this.paper.polygon(this.generateLineArray(bed.outline)).attr(bedStyle),
+            this.paper.polygon(
+                this.generateLineArray(pillowOnePoints)).attr(bedStyle).transform(
+                    "r" + Snap.angle(topRightPoint.x, topRightPoint.y, topLeftPoint.x, topLeftPoint.y) + ", " + topLeftPoint.x + ", " + topLeftPoint.y),
+            this.paper.polygon(
+                this.generateLineArray(pillowTwoPoints)).attr(bedStyle).transform(
+                    "r" + Snap.angle(topRightPoint.x, topRightPoint.y, topLeftPoint.x, topLeftPoint.y) + ", " + topLeftPoint.x + ", " + topLeftPoint.y)
+        );
+    }
+
+    drawRectWithLabel(rect, rectStyle) {
+        var rectObjs = [];
+        var centerPoint = this.lineMidPoint(rect.outline[0], rect.outline[2]);
+        rectObjs.push(
+            this.paper.polygon(this.generateLineArray(rect.outline)).attr(rectStyle),
+            this.paper.text(centerPoint.x, centerPoint.y, rect.label).attr({textAnchor: "middle", alignmentBaseline: "middle", fontSize: 8})
+        );
+    }
+
+    drawFurniture(furniture, furnitureStyle, scale) {
+        var hasBed = furniture.beds !== undefined ? furniture.beds : false;
+        var hasDresser = furniture.dressers !== undefined ? furniture.dressers : false;
+        var hasNightTable = furniture.nightTables !== undefined ? furniture.nightTables : false;
+        if (hasBed) {
+            hasBed.forEach((item) => {
+                this.drawBed(item, furnitureStyle.bed);
+            });
+        }
+        if (hasDresser) {
+            hasDresser.forEach((item) => {
+                this.drawRectWithLabel(item, furnitureStyle.dresser);
+            });
+        }
+        if (hasNightTable) {
+            hasNightTable.forEach((item) => {
+                this.drawRectWithLabel(item, furnitureStyle.nightTable);
+            });
+        }
+    }
+
+    drawGrid(unitLength, gridStyle) {
         var xMax = this.maxX / unitLength;
         var yMax = this.maxY / unitLength;
         for(var i = 0; i < yMax - 1; i++) {
@@ -359,9 +379,9 @@ export default class Floorplan {
                     }
                 ]};
             if (i % 5 === 0) {
-                this.majorGrid.push(this.drawLine(this.generateLineArray(horizontalLines.outline), {stroke: "#cccccc", strokeWidth: 1}));
+                this.majorGrid.push(this.drawLine(this.generateLineArray(horizontalLines.outline), gridStyle.majorGridLine));
             } else {
-                this.minorGrid.push(this.drawLine(this.generateLineArray(horizontalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
+                this.minorGrid.push(this.drawLine(this.generateLineArray(horizontalLines.outline), gridStyle.minorGridLine));
             }
         }
         for(var j = 0; j < xMax - 1; j++) {
@@ -377,14 +397,14 @@ export default class Floorplan {
                     }
                 ]};
             if (j % 5 === 0) {
-                this.majorGrid.push(this.drawLine(this.generateLineArray(verticalLines.outline), {stroke: "#ccc", strokeWidth: 1}));
+                this.majorGrid.push(this.drawLine(this.generateLineArray(verticalLines.outline), gridStyle.majorGridLine));
             } else {
-                this.minorGrid.push(this.drawLine(this.generateLineArray(verticalLines.outline), {stroke: "#eaeaea", strokeWidth: 1}));
+                this.minorGrid.push(this.drawLine(this.generateLineArray(verticalLines.outline), gridStyle.minorGridLine));
             }
         }
     }
 
-    drawCircle(centerPoint, radius, fill) {
-        return this.paper.circle(centerPoint.x, centerPoint.y, radius).attr({ fill: fill});
+    drawCircle(centerPoint, radius, circleStyle) {
+        return this.paper.circle(centerPoint.x, centerPoint.y, radius).attr(circleStyle);
     }
 }
