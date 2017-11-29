@@ -6,12 +6,22 @@ export var ellisOne = {
         number: 1
     },
     room: {
+        // outline: [
+        //     { x: 10, y: 10, radius: 0, curve: "none", index: 0 },
+        //     { x: 152, y: 10, radius: 0, curve: "none", index: 1 },
+        //     { x: 233, y: 123, radius: 0, curve: "none", index: 2 },
+        //     { x: 233, y: 257, radius: 0, curve: "none", index: 3 },
+        //     { x: 10, y: 257, radius: 0, curve: "none", index: 4 },
+        // ]
         outline: [
-            { x: 10, y: 10, radius: 0, curve: "none", index: 0 },
+            { x: 50, y: 10, radius: 0, curve: "none", index: 0 },
             { x: 152, y: 10, radius: 0, curve: "none", index: 1 },
-            { x: 233, y: 123, radius: 0, curve: "none", index: 2 },
-            { x: 233, y: 257, radius: 0, curve: "none", index: 3 },
-            { x: 10, y: 257, radius: 0, curve: "none", index: 4 },
+            { x: 233, y: 90, radius: 0, curve: "none", index: 2 },
+            { x: 233, y: 180, radius: 0, curve: "none", index: 3 },
+            { x: 180, y: 257, radius: 0, curve: "none", index: 3 },
+            { x: 100, y: 257, radius: 0, curve: "none", index: 3 },
+            { x: 10, y: 180, radius: 0, curve: "none", index: 3 },
+            { x: 10, y: 80, radius: 0, curve: "none", index: 4 },
         ]
     },
     features: {
