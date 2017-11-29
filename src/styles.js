@@ -1,14 +1,23 @@
 // Styles to be used in rendering our floorplans
 
-
 export var style = {
+    gridStyle: {
+        majorGridLine: {
+            stroke: "#cccccc",
+            strokeWidth: 1
+        },
+        minorGridLine: {
+            stroke: "#eaeaea",
+            strokeWidth: 1,
+        }
+    },
     roomOutline: {
         default: {
             stroke: "#000000",
             strokeWidth: 8,
             fill: "#f4e4d7",
-            fillOpacity: 1
-        },
+            fillOpacity: .5
+        }
     },
     interiorWalls: {
         default: {
@@ -16,17 +25,18 @@ export var style = {
             strokeWidth: 8,
             fill: "#f4e4d7",
             fillOpacity: 1
-        },
+        }
     },
     windowStyle: {
         default: {
             stroke: "#f9f9f9",
             strokeWidth: 6,
             fill: "none",
-            fillOpacity: 1
+            fillOpacity: 1,
+            strokeLinecap: "round"
         },
         open: {
-            stroke: "yellow", // need hex?
+            stroke: "yellow",
             strokeWidth: 6,
             fill: "none",
             fillOpacity: 1
@@ -64,9 +74,43 @@ export var style = {
                 strokeDasharray: "0",
                 strokeLinecap: "round"
             }
+        },
+        doorStop: {
+            default: {
+                stroke: "#c1272d",
+                strokeWidth: 1,
+                fill: "none",
+                fillOpacity: 1
+            },
+            open :{
+                stroke: "#ff00ff",
+                strokeWidth: 1,
+                fill: "none",
+                fillOpacity: 1
+            }
+        }
+    },
+    furniture: {
+        bed: {
+            stroke: "black",
+            strokeWidth: 1,
+            fill: "none",
+            fillOpacity: 1
+        },
+        dresser: {
+            stroke: "grey",
+            strokeWidth: 1,
+            fill: "none",
+            fillOpacity: 1
+        },
+        nightTable: {
+            stroke: "grey",
+            strokeWidth: 1,
+            fill: "none",
+            fillOpacity: 1
         }
     }
-}
+};
 
 
 
