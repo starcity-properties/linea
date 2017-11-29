@@ -1,8 +1,7 @@
 // Styles to be used in rendering our floorplans
 
-export var style;
 
-var style = {
+export var style = {
     roomOutline: {
         default: {
             stroke: "#000000",
