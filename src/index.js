@@ -4,13 +4,14 @@ import { ellisTwo } from './ellis2.js';
 import { ellisThree } from './ellis3.js';
 import { testRoom } from './testRoom.js';
 import { style } from './styles.js';
-import Floorplan from './linea.js';
+// import Floorplan from './linea.js';
+import Floorplan from './linea2.js';
 
 
 
 
 var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
-// roomRender.drawGrid(10);
+roomRender.drawGrid(10, style.gridStyle);
 
 roomRender.drawRoom(testRoom);
 roomRender.writeSizes(testRoom.room.outline);
