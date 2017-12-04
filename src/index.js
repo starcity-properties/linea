@@ -5,16 +5,18 @@ import { ellisThree } from './ellis3.js';
 import { testRoom } from './testRoom.js';
 import { style } from './styles.js';
 // import Floorplan from './linea.js';
-import Floorplan from './linea2.js';
+import { lineaCanvas, Room, Floor, Features } from './linea.js';
 
 
+var floorTest = new Floor("#svg", -5, -5, 600, 600);
 
+floorTest.drawFloor(testRoom);
 
-var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
-roomRender.drawGrid(10, style.gridStyle);
+// var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
+// roomRender.drawGrid(10, style.gridStyle);
 
-roomRender.drawRoom(testRoom);
-roomRender.writeSizes(testRoom.room.outline);
+// roomRender.drawRoom(testRoom);
+// roomRender.writeSizes(testRoom.room.outline);
 
 
 // setTimeout(function() {

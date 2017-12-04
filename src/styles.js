@@ -8,7 +8,7 @@ export var style = {
         },
         minorGridLine: {
             stroke: "#eaeaea",
-            strokeWidth: 1,
+            strokeWidth: 1
         }
     },
     roomOutline: {
@@ -19,7 +19,7 @@ export var style = {
             fillOpacity: .5
         }
     },
-    interiorWalls: {
+    interiorWallStyle: {
         default: {
             stroke: "#000000",
             strokeWidth: 8,
@@ -90,20 +90,24 @@ export var style = {
             }
         }
     },
-    furniture: {
-        bed: {
+    bedStyle: {
+        default: {
             stroke: "black",
             strokeWidth: 1,
             fill: "none",
             fillOpacity: 1
-        },
-        dresser: {
+        }
+    },
+    dresserStyle: {
+        default: {
             stroke: "grey",
             strokeWidth: 1,
             fill: "none",
             fillOpacity: 1
-        },
-        nightTable: {
+        }
+    },
+    nightTableStyle: {
+        default: {
             stroke: "grey",
             strokeWidth: 1,
             fill: "none",
@@ -111,6 +115,3 @@ export var style = {
         }
     }
 };
-
-
-
