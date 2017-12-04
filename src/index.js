@@ -5,10 +5,10 @@ import { ellisThree } from './ellis3.js';
 import { testRoom } from './testRoom.js';
 import { style } from './styles.js';
 // import Floorplan from './linea.js';
-import { lineaCanvas, Room, Floor, Feature } from './linea.js';
+import { lineaCanvas, Room, Floor, Features } from './linea.js';
 
 
-var floorTest = new Floor("#svg", 5, 5, 600, 600);
+var floorTest = new Floor("#svg", -5, -5, 600, 600);
 
 floorTest.drawFloor(testRoom);
 
