@@ -27,11 +27,11 @@ export default class lineaCanvas {
     }
 
     addFeature() {
-
+        // how to do?
     }
 
     removeFeature() {
-
+        // how to do?
     }
 
     addOrigin(outline, origin) {
@@ -81,10 +81,6 @@ export default class lineaCanvas {
     }
 
     drawPathOutline(points, closed, outlineStyle) {
-        // **********************************************************************
-        // Should make this more human readable. We dont have norm here
-        // **********************************************************************
-
         var pathString = this.compilePath(points,closed);
         var outline = this.paper.path(pathString);
         outline.attr(outlineStyle);
@@ -146,7 +142,7 @@ export default class lineaCanvas {
     }
 
     // **********************************************************************
-    // Generic functions to draw a polygon
+    // Generic functions to transform an object
     // **********************************************************************
 
     rotateObject(object, angle, origin) {
@@ -219,15 +215,14 @@ export default class lineaCanvas {
         this.drawHorizontalGrid(xMax, yMax, unitLength, gridStyle);
         this.drawVerticalGrid(xMax, yMax, unitLength, gridStyle);
     }
-
-
 }
-
 
 export class Room extends lineaCanvas {
     constructor(id, minX, minY, maxX, maxY) {
         super(id, minX, minY, maxX, maxY);
         this.walls = [];
+        this.features = {};
+        // this.features = new Features(id, minX, minY, maxX, maxY);
     }
 
     drawRoomOutline(points, id, outlineStyle) {
@@ -235,7 +230,7 @@ export class Room extends lineaCanvas {
         var path = this.drawPathOutline(points, true, outlineStyle);
         var lastItem = this.walls.push(path) - 1;
 
-        // give style to shape and assign id to object
+        // assign id to object
         this.walls[lastItem].id = id;
     }
 
@@ -245,8 +240,12 @@ export class Room extends lineaCanvas {
     // **********************************************************************
 
     drawRoom(room, origin) {
+        // console.log(room);
         var roomOutline = this.addOrigin(room.outline, origin);
         this.drawRoomOutline(roomOutline, room.unit.code, style.roomOutline.default);
+        this.features = new Features(this.id, this.minX, this.minY, this.maxX, this.maxY);
+        // console.log(room.features);
+        this.features.drawFeatures(room.features, origin);
     }
 }
 
@@ -260,14 +259,15 @@ export class Floor extends Room {
 
     drawFloor(floor) {
         this.floorPlan.push(this.drawRoom(floor.floor, floor.floor.unit.origin));
-        this.drawRooms(floor.rooms);
         this.features = new Features(this.id, this.minX, this.minY, this.maxX, this.maxY);
+        this.drawRooms(floor.rooms);
         this.features.drawFeatures(floor.features);
     }
 
     drawRooms(rooms) {
         rooms.forEach((item) => {
             this.drawRoom(item, item.unit.origin);
+            // this.features.drawFeatures(item.features);
         });
     }
 }
@@ -290,7 +290,9 @@ export class Features extends lineaCanvas {
         return features.filter((item) => (item.type === type));
     }
 
-    drawFeatures(featureObjs) {
+    drawFeatures(featureObjs, origin) {
+        if (featureObjs === undefined)
+            return ;
         var interiorWalls = this.filterFeature(featureObjs, "interiorWall");
         var doors = this.filterFeature(featureObjs, "door");
         var slidingDoors = this.filterFeature(featureObjs, "slidingDoor");
@@ -300,25 +302,25 @@ export class Features extends lineaCanvas {
         var nightTables = this.filterFeature(featureObjs, "nightTable");
 
         if (interiorWalls) {
-            this.drawInteriorWalls(interiorWalls, style.interiorWallStyle.default);
+            this.drawInteriorWalls(interiorWalls, style.interiorWallStyle.default, origin);
         }
         if (doors) {
-            this.drawDoors(doors, style.doorStyle);
+            this.drawDoors(doors, style.doorStyle, origin);
         }
         if (slidingDoors) {
-            this.drawSlidingDoors(slidingDoors, style.doorStyle);
+            this.drawSlidingDoors(slidingDoors, style.doorStyle, origin);
         }
         if (windows) {
-            this.drawWindows(windows, style.windowStyle.default);
+            this.drawWindows(windows, style.windowStyle.default, origin);
         }
         if (beds) {
-            this.drawBeds(beds, style.bedStyle.default);
+            this.drawBeds(beds, style.bedStyle.default, origin);
         }
         if (dressers) {
-            this.drawDressers(dressers, style.dresserStyle.default);
+            this.drawDressers(dressers, style.dresserStyle.default, origin);
         }
         if (nightTables) {
-            this.drawNightTables(nightTables, style.nightTableStyle.default);
+            this.drawNightTables(nightTables, style.nightTableStyle.default, origin);
         }
     }
 
@@ -332,9 +334,9 @@ export class Features extends lineaCanvas {
         this.windows.push(this.drawLine(newOutline, windowStyle));
     }
 
-    drawWindows(windows, windowStyle) {
+    drawWindows(windows, windowStyle, origin) {
         windows.forEach((window, index) => {
-            this.drawWindow(window, window.origin, windowStyle);
+            this.drawWindow(window, origin, windowStyle);
             this.windows[index].id = window.code;
         });
     }
@@ -348,9 +350,9 @@ export class Features extends lineaCanvas {
         this.interiorWalls.push(this.drawLine(newOutline, wallStyle));
     }
 
-    drawInteriorWalls(walls, wallStyle) {
+    drawInteriorWalls(walls, wallStyle, origin) {
         walls.forEach((wall, index) => {
-            this.drawInteriorWall(wall, wall.origin, wallStyle);
+            this.drawInteriorWall(wall, origin, wallStyle);
             this.interiorWalls[index].id = wall.code;
         });
     }
@@ -373,9 +375,9 @@ export class Features extends lineaCanvas {
         this.slidingDoors.push(slidingDoorLines);
     }
 
-    drawSlidingDoors(slidingDoors, slidingDoorStyle) {
+    drawSlidingDoors(slidingDoors, slidingDoorStyle, origin) {
         slidingDoors.forEach((item, index) => {
-            this.drawSlidingDoor(item, item.origin, slidingDoorStyle);
+            this.drawSlidingDoor(item, origin, slidingDoorStyle);
             this.slidingDoors[index].id = item.code;
         });
     }
@@ -446,9 +448,9 @@ export class Features extends lineaCanvas {
         this.doors.push(doorLines);
     }
 
-    drawDoors(doors, doorStyle) {
+    drawDoors(doors, doorStyle, origin) {
         doors.forEach((door, index) => {
-            this.drawDoor(door, door.origin, doorStyle);
+            this.drawDoor(door, origin, doorStyle);
             this.doors[index].id = door.code;
         });
     }
@@ -456,13 +458,6 @@ export class Features extends lineaCanvas {
     // **********************************************************************
     // DRAW BEDS
     // **********************************************************************
-
-    lineMidPoint(pointA, pointB) {
-        var midPoint = {};
-        midPoint.x = (pointA.x + pointB.x) / 2;
-        midPoint.y = (pointA.y + pointB.y) / 2;
-        return midPoint;
-    }
 
     getPillowPoints(xOffset, yOffset, lenght, height, origin) {
         var pillow = [
@@ -524,28 +519,28 @@ export class Features extends lineaCanvas {
         return rectObjs;
     }
 
-    drawBeds(beds, bedStyle) {
+    drawBeds(beds, bedStyle, origin) {
         if (beds) {
             beds.forEach((item) => {
-                this.beds.push(this.drawBed(item, item.origin, bedStyle));
+                this.beds.push(this.drawBed(item, origin, bedStyle));
             });
             this.furniture.push(this.beds);
         }
     }
 
-    drawDressers(dressers, dresserStyle) {
+    drawDressers(dressers, dresserStyle, origin) {
         if (dressers) {
             dressers.forEach((item) => {
-                this.dressers.push(this.drawRectWithLabel(item, item.origin, dresserStyle));
+                this.dressers.push(this.drawRectWithLabel(item, origin, dresserStyle));
             });
             this.furniture.push(this.dressers);
         }
     }
 
-    drawNightTables(nightTables, nightTableStyle) {
+    drawNightTables(nightTables, nightTableStyle, origin) {
         if (nightTables) {
             nightTables.forEach((item) => {
-                this.nightTables.push(this.drawRectWithLabel(item, item.origin, nightTableStyle));
+                this.nightTables.push(this.drawRectWithLabel(item, origin, nightTableStyle));
             });
             this.furniture.push(this.nightTables);
         }
