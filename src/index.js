@@ -6,16 +6,11 @@ import { testRoom } from './testRoom.js';
 import { style } from './styles.js';
 // import Floorplan from './linea.js';
 import { lineaCanvas, Room, Floor, Features } from './linea.js';
-import { kearnyFloorTwo } from './kearnyFloor.js';
-import { kearnyFloor2Room1 } from './kearny-f2-r1.js';
-import {kearnyFloorTwoFull } from './kearnyFloorFull.js';
+
 
 var floorTest = new Floor("#svg", -5, -5, 600, 600);
 
-// floorTest.drawFloor(testRoom);
-floorTest.drawFloor(kearnyFloorTwoFull);
-// floorTest.drawRoom(kearnyFloorTwo, kearnyFloorTwo.unit.origin);
-// floorTest.drawRoom(kearnyFloor2Room1, { x: 0, y: 0 });
+floorTest.drawFloor(testRoom);
 
 // var roomRender = new Floorplan("#svg", 0, 0, 600, 600);
 // roomRender.drawGrid(10, style.gridStyle);

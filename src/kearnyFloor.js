@@ -4,8 +4,7 @@ export var kearnyFloorTwo = {
         name: "1020-kearny-floor2",
         code: "1020-kearny-02",
         number: 2,
-        scale: 1, // what is this??
-        origin: {x: 0, y: 0}
+        scale: 1 // what is this??
     },
     room: {
         outline: [
