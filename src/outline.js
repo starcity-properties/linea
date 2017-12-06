@@ -3,6 +3,7 @@ import Drawing from './drawing.js';
 export default class Outline extends Drawing {
     constructor (canvas) {
         super(canvas);
+        this.walls = [];
     }
 
     drawOutline(points, id, outlineStyle) {
