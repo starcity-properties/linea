@@ -1,6 +1,6 @@
 import Outline from 'outline.js';
 
-export default class Floor extends Outline {
+export default class Floorplan extends Outline {
     constructor(canvas, origin, outline, id, style) {
         super(canvas);
         this.outline = this.addOrigin(outline, origin);
@@ -18,6 +18,16 @@ export default class Floor extends Outline {
                 item.outline = this.addOrigin(item.outline, origin);
             });
             this.features.push(item);
+        });
+    }
+
+    draw() {
+        this.drawOutline(this.outline, this.id, this.style);
+        this.rooms.forEach((item) => {
+            item.draw();
+        });
+        this.features.forEach((item) => {
+            item.draw();
         });
     }
 }
