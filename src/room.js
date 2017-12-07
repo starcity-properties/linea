@@ -10,7 +10,7 @@ export default class Room extends Outline {
     }
 
     draw() {
-        this.drawRoomOutline(this.outline, this.id, this.style);
+        this.drawOutline(this.outline, this.id, this.style);
         this.features.forEach((item) => {
             item.draw();
         });
