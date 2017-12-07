@@ -4,6 +4,15 @@ export default class Outline extends Drawing {
     constructor (canvas) {
         super(canvas);
         this.walls = [];
+        this.features = [];
+    }
+
+    addFeature(origin, ...features) {
+        features.forEach((item) => {
+            item.outline = this.addOrigin(item.outline, origin);
+            item.outline = this.addOrigin(item.outline, this.origin);
+            this.features.push(item);
+        });
     }
 
     drawOutline(points, id, outlineStyle) {

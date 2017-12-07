@@ -7,14 +7,6 @@ export default class Room extends Outline {
         this.origin = origin;
         this.id = id;
         this.style = style;
-        this.features = [];
-    }
-
-    addFeature(origin, ...args) {
-        args.forEach((item) => {
-            item.outline = this.addOrigin(item.outline, origin);
-            item.outline = this.addOrigin(item.outline. this.origin);
-        });
     }
 
     draw() {
