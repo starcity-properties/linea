@@ -49,3 +49,7 @@ yarn-error.log*
 
 # emacs
 .#*
+
+# testing files
+/src/canvas-lorem.js
+/src/drawing-lorem.js
