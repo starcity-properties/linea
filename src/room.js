@@ -11,6 +11,10 @@ export default class Room extends Outline {
     }
 
     addFeature(origin, ...args) {
+        args.forEach((item) => {
+            item.outline = this.addOrigin(item.outline, origin);
+            item.outline = this.addOrigin(item.outline. this.origin);
+        });
     }
 
     draw() {
