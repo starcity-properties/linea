@@ -1,18 +1,18 @@
 import './index.css';
-import { kearnyFloorTwo } from './kearnyFloor.js';
-import { kearnyFloor2Room1 } from './kearny-f2-r1.js';
-import { kearnyFloor2Room2 } from './kearny-f2-r2.js';
-import { kearnyFloor2Room3 } from './kearny-f2-r3.js';
+import { kearnyFloorTwo } from './example-floorplans/kearnyFloor.js';
+import { kearnyFloor2Room1 } from './example-floorplans/kearny-f2-r1.js';
+import { kearnyFloor2Room2 } from './example-floorplans/kearny-f2-r2.js';
+import { kearnyFloor2Room3 } from './example-floorplans/kearny-f2-r3.js';
 
-import { style } from './styles.js';
+import { style } from './linea/style/styles.js';
 
-import LineaCanvas from './canvas.js';
-import Floorplan from './floorplan.js';
-import Room from './room.js';
-import Feature from './feature.js';
-import Window from './window.js';
-import SlidingDoor from './sliding-door.js';
-import Door from './door.js';
+import LineaCanvas from './linea/canvas.js';
+import Floorplan from './linea/floorplan.js';
+import Room from './linea/room.js';
+import Feature from './linea/feature/feature.js';
+import Window from './linea/feature/window.js';
+import SlidingDoor from './linea/feature/sliding-door.js';
+import Door from './linea/feature/door.js';
 
 var canvas = new LineaCanvas("#svg", -5, -5, 600, 600);
 // console.log(canvas);

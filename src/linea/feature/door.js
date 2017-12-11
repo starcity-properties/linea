@@ -1,5 +1,5 @@
 import Snap from 'snapsvg-cjs';
-import Drawing from './drawing.js';
+import Drawing from '../drawing.js';
 
 export default class Door extends Drawing {
     constructor(canvas, outline, angle, direction, id, style) {

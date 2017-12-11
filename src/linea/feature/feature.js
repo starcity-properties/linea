@@ -1,4 +1,4 @@
-import  Drawing  from './drawing.js';
+import  Drawing  from '../drawing.js';
 
 export default class Feature extends Drawing {
     constructor(canvas) {

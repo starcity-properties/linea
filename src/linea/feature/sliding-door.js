@@ -1,4 +1,4 @@
-import Drawing from './drawing.js';
+import Drawing from '../drawing.js';
 
 export default class SlidingDoor extends Drawing {
     constructor(canvas, outline, id, style) {
