@@ -1,3 +1,4 @@
+import Snap from 'snapsvg-cjs';
 import LineaCanvas from './canvas.js';
 
 export default class Drawing {
