@@ -18,7 +18,7 @@ export var kearnyFloor2Room3 = {
             type: "door",
             code: "kearny-floor02-room02-door01",
             label: "door",
-            clockwise: true,
+            clockwise: false,
             outline: [
                 { x: 0, y: 36, index: 0 },
                 { x: 0, y: 12, index: 1 },

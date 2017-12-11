@@ -1,9 +1,9 @@
-import { Drawing } from './drawing.js';
+import  Drawing  from './drawing.js';
 
-export class Feature extends Drawing {
+export default class Feature extends Drawing {
     constructor(canvas) {
         super(canvas);
-        this.paper = canvas.paper;
-        this.features = [];
+        // this.paper = canvas.paper;
+        // this.features = [];
     }
 };
