@@ -32,6 +32,9 @@ export default class Drawing {
         // how to do?
     }
 
+    // **********************************************************************
+    // Shift Origin
+    // **********************************************************************
     addOrigin(outline, origin) {
         var newOutline = outline;
         if (origin.x || origin.y) {
@@ -175,12 +178,12 @@ export default class Drawing {
     // DRAW GRID
     // **********************************************************************
 
-    drawHorizontalGrid(xMax, yMax, unitLength, gridStyle) {
-        for(var i = 0; i < yMax - 1; i++) {
+    drawHorizontalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle) {
+        for(var i = xMin; i < yMax; i++) {
             var horizontalLines = {
                 outline:  [
-                    { x: 10, y: 10 + i * unitLength },
-                    { x: (xMax * unitLength) - 10, y: 10 + i * unitLength }
+                    { x: xMin, y: i * unitLength },
+                    { x: xMax * unitLength, y: i * unitLength }
                 ]};
             if (i % 5 === 0) {
                 this.majorGrid.push(this.drawLine(horizontalLines.outline, gridStyle.majorGridLine));
@@ -190,12 +193,12 @@ export default class Drawing {
         }
     }
 
-    drawVerticalGrid(xMax, yMax, unitLength, gridStyle) {
-        for(var j = 0; j < xMax - 1; j++) {
+    drawVerticalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle) {
+        for(var j = xMin; j < xMax; j++) {
             var verticalLines = {
                 outline:  [
-                    { x: 10 + j * unitLength, y: 10 },
-                    { x: 10 + j * unitLength, y: (yMax * unitLength) - 10 }
+                    { x: j * unitLength, y: yMin },
+                    { x: j * unitLength, y: yMax * unitLength }
                 ]};
             if (j % 5 === 0) {
                 this.majorGrid.push(this.drawLine(verticalLines.outline, gridStyle.majorGridLine));
@@ -208,8 +211,10 @@ export default class Drawing {
     drawGrid(unitLength, gridStyle) {
         var xMax = this.maxX / unitLength;
         var yMax = this.maxY / unitLength;
+        var xMin = this.minX;
+        var yMin = this.minY;
 
-        this.drawHorizontalGrid(xMax, yMax, unitLength, gridStyle);
-        this.drawVerticalGrid(xMax, yMax, unitLength, gridStyle);
+        this.drawHorizontalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle);
+        this.drawVerticalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle);
     }
 }

@@ -26,6 +26,7 @@ export var kearnyFloorTwo = {
             type: "window",
             code: "1020-kearny-02-window01",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 24, y: 0, radius: 0, curve: "none", index: 0 },
                 { x: 84, y: 0, radius: 0, curve: "none", index: 1 },
@@ -35,6 +36,7 @@ export var kearnyFloorTwo = {
             type: "window",
             code: "1020-kearny-02-window02",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 276, y: 0, radius: 0, curve: "none", index: 0 },
                 { x: 318, y: 0, radius: 0, curve: "none", index: 1 },
@@ -44,6 +46,7 @@ export var kearnyFloorTwo = {
             type: "window",
             code: "1020-kearny-02-window03",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 274, y: 214, radius: 0, curve: "none", index: 0 },
                 { x: 256, y: 214, radius: 0, curve: "none", index: 1 },
@@ -53,6 +56,7 @@ export var kearnyFloorTwo = {
             type: "window",
             code: "1020-kearny-02-window04",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 248, y: 214, radius: 0, curve: "none", index: 0 },
                 { x: 228, y: 214, radius: 0, curve: "none", index: 1 },
@@ -62,6 +66,7 @@ export var kearnyFloorTwo = {
             type: "window",
             code: "1020-kearny-02-window05",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 160, y: 214, radius: 0, curve: "none", index: 0 },
                 { x: 130, y: 214, radius: 0, curve: "none", index: 1 },
@@ -71,10 +76,33 @@ export var kearnyFloorTwo = {
             type: "window",
             code: "1020-kearny-02-window06",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 64, y: 214, radius: 0, curve: "none", index: 0 },
                 { x: 36, y: 214, radius: 0, curve: "none", index: 1 },
             ]
+        },
+        {
+            type: "dresser",
+            code: "kearny-floor2-table",
+            label: "Food Table",
+            origin: {x: 0, y: 0},
+            outline: [
+                {x: 230, y: 130, index: 0},
+                {x: 250, y: 130, index: 1},
+                {x: 250, y: 210, index: 2},
+                {x: 230, y: 210, index: 3}
+            ]
+        },
+        {
+            type: "interiorWall",
+            code: "dry-erase",
+            origin: {x: 0, y: 0},
+            outline: [
+                { x: 80, y: 50},
+                { x: 80, y: 100}
+            ]
         }
+
     ]
 };

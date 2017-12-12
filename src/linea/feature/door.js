@@ -1,16 +1,14 @@
 import Snap from 'snapsvg-cjs';
-import Drawing from '../drawing.js';
+import Feature from './feature.js';
 
-export default class Door extends Drawing {
-    constructor(canvas, outline, angle, direction, id, style) {
-        // console.log(style);
+export default class Door extends Feature {
+    constructor(canvas, origin, outline, angle, direction, id, style) {
         super(canvas);
-        this.outline = outline;
-        // console.log(outline);
+        this.outline = this.addOrigin(outline, origin);
+        this.origin = origin;
         this.id = id;
         this.angle = angle;
         this.radius = this.lineLength(this.outline[0], this.outline[1]);
-        console.log(direction);
         this.curve = direction ? "concave" : "convex";
         this.doors = [];
         this.doorStyle = style.door.default;
@@ -67,6 +65,6 @@ export default class Door extends Drawing {
             this.drawPathOutline(curve, false, this.projectionStyle),
         );
 
-        this.doors.push(lines);
+        this.features.push(this.doors.push(lines));
     }
 };

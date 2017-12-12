@@ -85,7 +85,7 @@ export var kearnyFloorTwoFull = {
                     { x: 36, y: 214, radius: 0, curve: "none", index: 1 },
                 ]
             }
-        ],
+        ]
     },
     rooms: [
         {
