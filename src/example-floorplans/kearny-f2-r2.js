@@ -5,7 +5,7 @@ export var kearnyFloor2Room2 = {
         rate: 2000,
         number: 1,
         scale: 1,
-        origin: {x: 192, y: 0}
+        origin: {x: 188, y: 0}
     },
     outline: [
         { x: 0, y: 0, radius: 0, curve: "none", index: 0 },
@@ -18,6 +18,7 @@ export var kearnyFloor2Room2 = {
             type: "window",
             code: "kearny-floor02-room02-window01",
             label: "window",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 22, y: 0, radius: 0, curve: "none", index: 0 },
                 { x: 62, y: 0, radius: 0, curve: "none", index: 1 }
@@ -27,6 +28,7 @@ export var kearnyFloor2Room2 = {
             type: "slidingDoor",
             code: "kearny-floor02-room02-slidingDoor01",
             label: "sliding door",
+            origin: {x: 0, y: 0},
             outline: [
                 { x: 70, y: 44, index: 0 },
                 { x: 70, y: 24, index: 1 },

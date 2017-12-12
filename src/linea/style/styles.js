@@ -22,7 +22,7 @@ export var style = {
     interiorWallStyle: {
         default: {
             stroke: "#000000",
-            strokeWidth: 8,
+            strokeWidth: 1,
             fill: "#f4e4d7",
             fillOpacity: 1
         }

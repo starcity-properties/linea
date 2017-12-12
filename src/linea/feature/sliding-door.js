@@ -1,10 +1,10 @@
-import Drawing from './drawing.js';
+import Feature from './feature.js';
 
-export default class SlidingDoor extends Drawing {
-    constructor(canvas, outline, id, style) {
+export default class SlidingDoor extends Feature {
+    constructor(canvas, origin, outline, id, style) {
         super(canvas);
-        this.outline = outline;
-        // console.log(outline);
+        this.outline = this.addOrigin(outline, origin);
+        this.origin = origin;
         this.id = id;
         this.slidingDoors = [];
         this.doorStyle = style.door.default;
@@ -19,6 +19,6 @@ export default class SlidingDoor extends Drawing {
         lines.push(this.drawLine(doorSegment, this.doorStyle),
                    this.drawLine(projection, this.projectionStyle));
 
-        this.slidingDoors.push(lines);
+        this.features.push(this.slidingDoors.push(lines));
     }
 };
