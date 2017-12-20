@@ -1,26 +1,27 @@
-import Drawing from './drawing.js';
+import Drawing from './drawing';
 
 export default class Outline extends Drawing {
-    constructor (canvas) {
-        super(canvas);
-        this.walls = [];
-        this.features = [];
-    }
+  constructor(canvas) {
+    super(canvas);
+    this.walls = [];
+    this.features = [];
+  }
 
-    addFeature(origin, ...features) {
-        features.forEach((item) => {
-            item.outline = this.addOrigin(item.outline, origin);
-            item.outline = this.addOrigin(item.outline, this.origin);
-            this.features.push(item);
-        });
-    }
+  addFeature(origin, ...features) {
+    features.forEach((item) => {
+      const newItem = item;
+      newItem.outline = this.addOrigin(newItem.outline, origin);
+      newItem.outline = this.addOrigin(newItem.outline, this.origin);
+      this.features.push(newItem);
+    });
+  }
 
-    drawOutline(points, id, outlineStyle) {
-        // compilePath() takes points and makes the string to pass into path?
-        var path = this.drawPathOutline(points, true, outlineStyle);
-        var lastItem = this.walls.push(path) - 1;
+  drawOutline(points, id, outlineStyle) {
+    // compilePath() takes points and makes the string to pass into path?
+    const path = this.drawPathOutline(points, true, outlineStyle);
+    const lastItem = this.walls.push(path) - 1;
 
-        // assign id to object
-        this.walls[lastItem].id = id;
-    }
+    // assign id to object
+    this.walls[lastItem].id = id;
+  }
 }
