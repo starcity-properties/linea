@@ -1,0 +1,12 @@
+/config
+/example-floorplans
+/index.js
+/index.css
+/oldSrc
+/public
+/scripts
+/src
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

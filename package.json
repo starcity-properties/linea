@@ -2,7 +2,7 @@
     "name": "linea",
     "version": "3.0.0",
     "description": "A javascript library to draw floorplans",
-    "main": "index.js",
+    "main": "dist/minified-linea/linea-min.js",
     "module": "src/index.js",
     "repository": "git@github.com:starcity-properties/linea.git",
     "author": "starcity-properties",
@@ -55,12 +55,9 @@
         "extends": "airbnb-base"
     },
     "dependencies": {
-        "next": "^4.2.1",
-        "snapsvg-cjs": "^0.0.6",
-        "webpack-stats-plugin": "^0.1.5"
+        "snapsvg-cjs": "^0.0.6"
     },
     "devDependencies": {
-        "@types/snapsvg": "^0.4.29",
         "autoprefixer": "7.1.6",
         "babel-core": "6.26.0",
         "babel-eslint": "7.2.3",
@@ -71,7 +68,6 @@
         "babel-preset-react-app": "^3.1.0",
         "babel-runtime": "6.26.0",
         "case-sensitive-paths-webpack-plugin": "2.1.1",
-        "chalk": "1.1.3",
         "css-loader": "0.28.7",
         "dotenv": "4.0.0",
         "eslint": "^4.13.1",
