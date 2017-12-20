@@ -1,50 +1,49 @@
-import Outline from './outline.js';
+import Outline from './outline';
 
 export default class Floorplan extends Outline {
-    constructor(canvas, origin, outline, id, style) {
-        super(canvas);
-        this.outline = this.addOrigin(outline, origin);
-        this.origin = origin;
-        this.id = id;
-        this.style = style;
-        this.rooms = [];
-        this.features = [];
-    }
+  constructor(canvas, origin, outline, id, style) {
+    super(canvas);
+    this.outline = Floorplan.addOrigin(outline, origin);
+    this.origin = origin;
+    this.id = id;
+    this.style = style;
+    this.rooms = [];
+    this.features = [];
+  }
 
-    addRoom(origin, ...rooms) {
-        rooms.forEach((item) => {
-            item.outline = this.addOrigin(item.outline, origin);
-            item.outline = this.addOrigin(item.outline, this.origin);
-            item.features.forEach((item) => {
-                item.outline = this.addOrigin(item.outline, origin);
-            });
-            this.rooms.push(item);
-        });
-    }
+  addRoom(origin, ...rooms) {
+    rooms.forEach((item) => {
+      const newItem = item;
+      newItem.outline = Floorplan.addOrigin(item.outline, origin);
+      newItem.outline = Floorplan.addOrigin(item.outline, this.origin);
+      newItem.features.forEach((feature) => {
+        const newFeature = feature;
+        newFeature.outline = Floorplan.addOrigin(newFeature.outline, origin);
+        return newFeature;
+      });
+      this.rooms.push(newItem);
+    });
+  }
 
-    // need to add origin modifier to this
-    addFeatures(origin, feature1, ...moreFeatures) {
-        feature1.forEach((item) => {
-            item.outline = this.addOrigin(item.outline, origin);
-            item.outline = this.addOrigin(item.outline, this.origin);
-            this.features.push(item);
-        });
-        moreFeatures.forEach((item) => {
-            item.forEach((item2) => {
-                item2.outline = this.addOrigin(item2.outline, origin);
-                item2.outline = this.addOrigin(item2.outline, this.origin);
-                this.features.push(item2);
-            });
-        });
-    }
+  // need to add origin modifier to this
+  addFeatures(origin, ...Features) {
+    Features.forEach((array) => {
+      array.forEach((feature) => {
+        const newFeature = feature;
+        newFeature.outline = Floorplan.addOrigin(newFeature.outline, origin);
+        newFeature.outline = Floorplan.addOrigin(newFeature.outline, this.origin);
+        this.features.push(newFeature);
+      });
+    });
+  }
 
-    draw() {
-        this.drawOutline(this.outline, this.id, this.style);
-        this.rooms.forEach((item) => {
-            item.draw();
-        });
-        this.features.forEach((item) => {
-            item.draw();
-        });
-    }
+  draw() {
+    this.drawOutline(this.outline, this.id, this.style);
+    this.rooms.forEach((item) => {
+      item.draw();
+    });
+    this.features.forEach((item) => {
+      item.draw();
+    });
+  }
 }
