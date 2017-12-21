@@ -6,41 +6,23 @@ import kFloor2Room3 from './example-floorplans/k-f2-r3';
 
 import style from './src/linea/style/styles';
 
-// import {LineaCanvas,
-//         Floorplan,
-//         Room,
-//         InteriorWall,
-//         Window,
-//         SlidingDoor,
-//         Bed,
-//         NightTable,
-//         Dresser,
-//         Door,
-//        } from './dist/linea/linea';
+// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door } from 'linea';
 
-// import {LineaCanvas,
-//         Floorplan,
-//         Room,
-//         InteriorWall,
-//         Window,
-//         SlidingDoor,
-//         Bed,
-//         NightTable,
-//         Dresser,
-//         Door,
-//        } from './dist/minified-linea/linea-min';
+// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door } from './dist/linea/linea';
 
-import LineaCanvas from './src/linea/canvas';
-import Floorplan from './src/linea/floorplan';
-import Room from './src/linea/room';
-import Feature from './src/linea/feature/feature';
-import Window from './src/linea/feature/window';
-import SlidingDoor from './src/linea/feature/sliding-door';
-import Door from './src/linea/feature/door';
-import Dresser from './src/linea/feature/dresser';
-import Bed from './src/linea/feature/bed';
-import NightTable from './src/linea/feature/nightTable';
-import InteriorWall from './src/linea/feature/interiorWall';
+import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door } from './dist/minified-linea/linea-min';
+
+// import LineaCanvas from './src/linea/canvas';
+// import Floorplan from './src/linea/floorplan';
+// import Room from './src/linea/room';
+// import Feature from './src/linea/feature/feature';
+// import Window from './src/linea/feature/window';
+// import SlidingDoor from './src/linea/feature/sliding-door';
+// import Door from './src/linea/feature/door';
+// import Dresser from './src/linea/feature/dresser';
+// import Bed from './src/linea/feature/bed';
+// import NightTable from './src/linea/feature/nightTable';
+// import InteriorWall from './src/linea/feature/interiorWall';
 
 
 function makeInteriorWall(canvas, interiorWalls, interiorWallStyle) {
