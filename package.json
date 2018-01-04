@@ -54,7 +54,7 @@
     "eslintConfig": {
         "extends": "airbnb-base"
     },
-    "dependencies": {
+    "peerDependencies": {
         "snapsvg-cjs": "^0.0.6"
     },
     "devDependencies": {
