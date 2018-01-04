@@ -7,13 +7,13 @@ import kFloor2Room3 from './example-floorplans/k-f2-r3';
 import defaultStyle from './src/linea/style/styles';
 
 // Test linea from Node Modules
-// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door } from 'linea';
+// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door, Stairs } from 'linea';
 
 // Test unminified linea
-// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door } from './dist/linea/linea';
+// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door, Stairs } from './dist/linea/linea';
 
 // Test minified linea
-// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door } from './dist/minified-linea/linea-min';
+// import { LineaCanvas, Floorplan, Room, InteriorWall, Window, SlidingDoor, Bed, NightTable, Dresser, Door, Stairs } from './dist/minified-linea/linea-min';
 
 // Test individual Class Files
 import LineaCanvas from './src/linea/canvas';
@@ -27,6 +27,17 @@ import Dresser from './src/linea/feature/dresser';
 import Bed from './src/linea/feature/bed';
 import NightTable from './src/linea/feature/nightTable';
 import InteriorWall from './src/linea/feature/interiorWall';
+import Stairs from './src/linea/feature/stairs';
+
+function makeStairs(canvas, stairs, stairsStyle) {
+  const stairsObj = [];
+
+  stairs.forEach((item) => {
+    stairsObj.push(new Stairs(canvas, item.origin, item.outline, 6, item.vertical, stairsStyle));
+  });
+
+  return stairsObj;
+}
 
 function makeInteriorWall(canvas, interiorWalls, interiorWallStyle) {
   const interiorWallsObj = [];
@@ -121,6 +132,9 @@ kDryErase = makeInteriorWall(canvas, kDryErase, defaultStyle.interiorWallStyle.d
 let kWindows = getFeature(kFloorTwo.features, 'window');
 kWindows = makeWindows(canvas, kWindows, defaultStyle.windowStyle.default);
 
+let kStairs = getFeature(kFloorTwo.features, 'stairs');
+kStairs = makeStairs(canvas, kStairs, defaultStyle.bedStyle.default);
+
 const test1 = [kWindows[0], kWindows[1]];
 const test2 = [kWindows[2], kWindows[3]];
 const test3 = [kWindows[4], kWindows[5]];
@@ -151,6 +165,7 @@ dresserTables = makeDresser(canvas, dresserTables, defaultStyle.dresserStyle.def
 
 k.addFeature({ x: 0, y: 0 }, test1, test2, test3);
 k.addFeature({ x: 0, y: 0 }, kDryErase);
+k.addFeature({ x: 0, y: 0 }, kStairs);
 jazz.addFeature({ x: 0, y: 0 }, jazzWindow, jazzWindow, jazzSlidingDoors);
 jazz.addFeature({ x: 0, y: 0 }, jazzBed);
 jazz.addFeature({ x: 0, y: 0 }, jazzBarCart);

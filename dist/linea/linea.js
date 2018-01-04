@@ -839,6 +839,15 @@ Object.defineProperty(exports, 'NightTable', {
   }
 });
 
+var _stairs = __webpack_require__(17);
+
+Object.defineProperty(exports, 'Stairs', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_stairs).default;
+  }
+});
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
@@ -1570,6 +1579,84 @@ var NightTable = function (_Feature) {
 }(_feature2.default);
 
 exports.default = NightTable;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _feature = __webpack_require__(1);
+
+var _feature2 = _interopRequireDefault(_feature);
+
+var _styles = __webpack_require__(0);
+
+var _styles2 = _interopRequireDefault(_styles);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Stairs = function (_Feature) {
+  _inherits(Stairs, _Feature);
+
+  function Stairs(canvas, origin, outline, span, vertical, stairsStyle) {
+    _classCallCheck(this, Stairs);
+
+    var _this = _possibleConstructorReturn(this, (Stairs.__proto__ || Object.getPrototypeOf(Stairs)).call(this, canvas));
+
+    _this.outline = outline !== undefined && Stairs.checkOutline(outline);
+    if (_this.outline.length < 4) {
+      throw Error('Not enough valid points in Stairs Outline');
+    }
+    _this.origin = origin !== undefined && origin;
+    _this.span = span !== undefined && span;
+    _this.vertical = Stairs.isBoolean(vertical) && vertical;
+    _this.style = stairsStyle !== undefined ? stairsStyle : _styles2.default.stairStyle.default;
+    _this.stairs = [];
+    _this.features.push(_this.stairs);
+    return _this;
+  }
+
+  _createClass(Stairs, [{
+    key: 'draw',
+    value: function draw() {
+      var xMin = this.outline.reduce(function (prev, curr) {
+        return prev.x < curr.x ? prev : curr;
+      }).x / this.span;
+      var yMin = this.outline.reduce(function (prev, curr) {
+        return prev.y < curr.y ? prev : curr;
+      }).y / this.span;
+      var xMax = this.outline.reduce(function (prev, curr) {
+        return prev.x > curr.x ? prev : curr;
+      }).x / this.span;
+      var yMax = this.outline.reduce(function (prev, curr) {
+        return prev.y > curr.y ? prev : curr;
+      }).y / this.span;
+      if (this.vertical !== undefined && this.vertical) {
+        this.drawVerticalGrid(xMin, yMin, xMax, yMax, this.span, this.style, this.style);
+      } else if (this.vertical !== undefined) {
+        this.drawHorizontalGrid(xMin, yMin, xMax, yMax, this.span, this.style, this.style);
+      }
+    }
+  }]);
+
+  return Stairs;
+}(_feature2.default);
+
+exports.default = Stairs;
 
 /***/ })
 /******/ ]);

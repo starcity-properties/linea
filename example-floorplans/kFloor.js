@@ -147,7 +147,30 @@ const kFloorTwo = {
         { x: 80, y: 100 },
       ],
     },
-
+    {
+      type: 'stairs',
+      code: 'k-floor2-stairs',
+      origin: { x: 0, y: 0 },
+      vertical: false,
+      outline: [
+        { x: 310, y: 30 },
+        { x: 335, y: 30 },
+        { x: 335, y: 90 },
+        { x: 310, y: 90 },
+      ],
+    },
+    {
+      type: 'stairs',
+      code: 'k-floor2-stairs2',
+      origin: { x: 0, y: 0 },
+      vertical: true,
+      outline: [
+        { x: 290, y: 90 },
+        { x: 310, y: 90 },
+        { x: 310, y: 120 },
+        { x: 290, y: 120 },
+      ],
+    },
   ],
 };
 
