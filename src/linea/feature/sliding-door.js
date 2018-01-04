@@ -1,14 +1,20 @@
 import Feature from './feature';
+import defaultStyle from '../style/styles';
 
 export default class SlidingDoor extends Feature {
-  constructor(canvas, origin, outline, id, style) {
+  constructor(canvas, origin, outline, id, doorStyle, doorProjStyle) {
     super(canvas);
-    this.outline = this.constructor.addOrigin(outline, origin);
-    this.origin = origin;
-    this.id = id;
+    this.outline = outline !== undefined && SlidingDoor.addOrigin(outline, origin);
+    if (this.outline.length < 3) {
+      throw Error('Not enough valid points in SlidingDoor Outline');
+    }
+    this.origin = origin !== undefined && origin;
+    this.id = id !== undefined && id;
     this.slidingDoors = [];
-    this.doorStyle = style.door.default;
-    this.projectionStyle = style.projection.default;
+    this.doorStyle = doorStyle !== undefined ? doorStyle : defaultStyle.doorStyle.door.default;
+    this.projStyle = doorProjStyle !== undefined
+      ? doorProjStyle : defaultStyle.doorStyle.projection.default;
+    this.features.push(this.slidingDoors);
   }
 
   draw() {
@@ -18,9 +24,9 @@ export default class SlidingDoor extends Feature {
 
     lines.push(
       this.drawLine(doorSegment, this.doorStyle),
-      this.drawLine(projection, this.projectionStyle),
+      this.drawLine(projection, this.projStyle),
     );
 
-    this.features.push(this.slidingDoors.push(lines));
+    this.slidingDoors.push(lines);
   }
 }

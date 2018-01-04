@@ -1,3 +1,5 @@
+export { default as defaultStyle } from './linea/style/styles.js';
+
 export { default as LineaCanvas } from './linea/canvas.js';
 
 export { default as Drawing } from './linea/drawing.js';

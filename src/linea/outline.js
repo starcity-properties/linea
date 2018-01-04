@@ -1,4 +1,5 @@
 import Drawing from './drawing';
+import defaultStyle from './style/styles';
 
 export default class Outline extends Drawing {
   constructor(canvas) {
@@ -8,20 +9,34 @@ export default class Outline extends Drawing {
   }
 
   addFeature(origin, ...features) {
-    features.forEach((item) => {
-      const newItem = item;
-      newItem.outline = this.addOrigin(newItem.outline, origin);
-      newItem.outline = this.addOrigin(newItem.outline, this.origin);
-      this.features.push(newItem);
+    features.forEach((array) => {
+      array.forEach((item) => {
+        const newItem = item.outline !== undefined && item;
+        if (newItem) {
+          newItem.outline = origin !== undefined &&
+            Outline.addOrigin(newItem.outline, origin);
+          newItem.outline = this.origin !== undefined &&
+            Outline.addOrigin(newItem.outline, this.origin);
+          this.features.push(newItem);
+        } else {
+          // eslint-disable-next-line
+          console.warn(`addFeature: Error, feature or feature outline is undefined ${item}`);
+        }
+      });
     });
   }
 
   drawOutline(points, id, outlineStyle) {
-    // compilePath() takes points and makes the string to pass into path?
-    const path = this.drawPathOutline(points, true, outlineStyle);
-    const lastItem = this.walls.push(path) - 1;
+    const newStyle = outlineStyle !== undefined ? outlineStyle : defaultStyle.roomOutline.default;
+    const path = points && this.drawPathOutline(points, true, newStyle);
+    const lastItem = path && this.walls.push(path) - 1;
 
-    // assign id to object
-    this.walls[lastItem].id = id;
+    // Assign id to object
+    if (path && id) {
+      this.walls[lastItem].id = id;
+    } else {
+      // eslint-disable-next-line
+      console.warn("drawOutline: Warning, Floor/Room does not have an id");
+    }
   }
 }

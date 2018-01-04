@@ -1,14 +1,16 @@
 import Snap from 'snapsvg-cjs';
+import defaultStyle from './style/styles';
 
 export default class Drawing {
   constructor(canvas) {
     this.paper = canvas.paper;
     this.minX = canvas.minX;
     this.minY = canvas.minY;
-    this.maxX = canvas.maxX;
-    this.maxY = canvas.maxY;
+    this.width = canvas.width;
+    this.height = canvas.height;
     this.majorGrid = [];
     this.minorGrid = [];
+    this.labels = [];
   }
 
   // **********************************************************************
@@ -27,21 +29,50 @@ export default class Drawing {
     // how to do?
   }
 
+  static isNumber(obj) {
+    return obj !== undefined && typeof obj === 'number' && !Number.isNaN(obj);
+  }
+
+  static isBoolean(obj) {
+    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+  }
+
+  static checkOutline(outline) {
+    if (outline !== undefined && Array.isArray(outline)) {
+      const checkOutline = outline.filter((item) => {
+        if (Drawing.isNumber(item.x) && Drawing.isNumber(item.y)) {
+          return item;
+        }
+        // eslint-disable-next-line
+        return console.warn(`checkOutline: Error, outline X and Y values must be numbers => 'X: ${item.x}' 'Y: ${item.y}'`) && null;
+      });
+      return checkOutline;
+    }
+    // eslint-disable-next-line
+    return console.warn(`checkOutline: Error, invalid outline => '${outline}'`) && null;
+  }
+
   // **********************************************************************
   // Shift Origin
   // **********************************************************************
-  // eslint-disable-line
   static addOrigin(outline, origin) {
-    let newOutline = outline;
-    if (origin.x || origin.y) {
-      newOutline = outline.map((item) => {
-        const newItem = item;
-        newItem.x += origin.x;
-        newItem.y += origin.y;
-        return newItem;
-      });
+    const testOutline = Drawing.checkOutline(outline);
+    if (testOutline !== undefined || origin !== undefined) {
+      const originX = Drawing.isNumber(origin.x) && origin.x;
+      const originY = Drawing.isNumber(origin.y) && origin.y;
+      let newOutline = testOutline;
+      if (newOutline && (originX || originY)) {
+        newOutline = newOutline.map((item) => {
+          const newItem = item;
+          newItem.x += originX;
+          newItem.y += originY;
+          return newItem;
+        });
+      }
+      return newOutline;
     }
-    return newOutline;
+    // eslint-disable-next-line
+    return console.warn('addOrigin: Error, invalid outline or origin') && testOutline;
   }
 
   // **********************************************************************
@@ -51,13 +82,15 @@ export default class Drawing {
   // Function to create the string to draw path
   static compilePath(points, closed) {
     const path = [];
+    const newPoints = Drawing.checkOutline(points);
+    const testClosed = Drawing.isBoolean(closed) && closed;
 
     // Iterates through each point object to create path
     // M starts a path
     // A indicates an arc. Uses: xRadius, yRadius, rotation, arc-flag, sweep-flag, endX, endY.
     // L indicate a straight line to (x, y)
     // Z closes the shape of the path
-    points.forEach((point, index) => {
+    newPoints.forEach((point, index) => {
       if (index === 0) {
         path.push('M', point.x, point.y);
       } else if (point.radius > 0 && point.curve === 'concave') {
@@ -68,7 +101,7 @@ export default class Drawing {
         path.push('L', point.x, point.y);
       }
     });
-    if (closed) {
+    if (testClosed) {
       path.push('Z');
     }
 
@@ -79,7 +112,8 @@ export default class Drawing {
   drawPathOutline(points, closed, outlineStyle) {
     const pathString = Drawing.compilePath(points, closed);
     const outline = this.paper.path(pathString);
-    outline.attr(outlineStyle);
+    const newStyle = outlineStyle !== undefined ? outlineStyle : defaultStyle.roomOutline.default;
+    outline.attr(newStyle);
 
     return outline;
   }
@@ -99,8 +133,9 @@ export default class Drawing {
   // takes outline object and created array of points to be fed into polyline draw
   static generateLineArray(outline) {
     const linePoints = [];
+    const newOutline = Drawing.checkOutline(outline);
 
-    outline.forEach((point) => {
+    newOutline.forEach((point) => {
       linePoints.push(Drawing.generatePointArray(point));
     });
     return linePoints;
@@ -108,8 +143,9 @@ export default class Drawing {
 
   drawLine(poinstObject, lineStyle) {
     const points = Drawing.generateLineArray(poinstObject);
+    const newStyle = lineStyle !== undefined ? lineStyle : defaultStyle.interiorWallStyle.default;
 
-    return this.paper.polyline(points).attr(lineStyle);
+    return this.paper.polyline(points).attr(newStyle);
   }
 
 
@@ -117,21 +153,26 @@ export default class Drawing {
   // Generic functions to draw a polygon
   // **********************************************************************
 
-  drawPolygon(pointObject, style) {
+  drawPolygon(pointObject, polyStyle) {
     const points = Drawing.generateLineArray(pointObject);
+    const newStyle = polyStyle !== undefined ? polyStyle : defaultStyle.roomOutline.default;
 
-    return this.paper.polygon(points).attr(style);
+    return this.paper.polygon(points).attr(newStyle);
   }
 
   // **********************************************************************
   // Generic function to write labels
   // **********************************************************************
 
-  writeLabel(text, origin, style) {
-    const label = this.paper.text(origin.x, origin.y, text);
-    label.attr(style);
-
-    return label;
+  writeLabel(originX, originY, text, labelStyle) {
+    const newOriginX = Drawing.isNumber(originX) && originX;
+    const newOriginY = Drawing.isNumber(originY) && originY;
+    if (newOriginX || newOriginY) {
+      const label = this.paper.text(newOriginX, newOriginY, text);
+      const newStyle = labelStyle !== undefined ? labelStyle : defaultStyle.labelStyle;
+      label.attr(newStyle);
+      this.labels.push(label);
+    }
   }
 
   // **********************************************************************
@@ -147,7 +188,8 @@ export default class Drawing {
   // **********************************************************************
 
   drawCircle(centerPoint, radius, circleStyle) {
-    return this.paper.circle(centerPoint.x, centerPoint.y, radius).attr(circleStyle);
+    const newStyle = circleStyle !== undefined ? circleStyle : defaultStyle.circleStyle;
+    return this.paper.circle(centerPoint.x, centerPoint.y, radius).attr(newStyle);
   }
 
   // **********************************************************************
@@ -171,45 +213,52 @@ export default class Drawing {
   // DRAW GRID
   // **********************************************************************
 
-  drawHorizontalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle) {
-    for (let i = xMin; i < yMax; i += 1) {
+  drawHorizontalGrid(xMin, yMin, xMax, yMax, unitLength, majorGridStyle, minorGridStyle) {
+    for (let i = yMin; i <= yMax; i += 1) {
       const horizontalLines = {
         outline: [
-          { x: xMin, y: i * unitLength },
+          { x: xMin * unitLength, y: i * unitLength },
           { x: xMax * unitLength, y: i * unitLength },
         ],
       };
       if (i % 5 === 0) {
-        this.majorGrid.push(this.drawLine(horizontalLines.outline, gridStyle.majorGridLine));
+        this.majorGrid.push(this.drawLine(horizontalLines.outline, majorGridStyle));
       } else {
-        this.minorGrid.push(this.drawLine(horizontalLines.outline, gridStyle.minorGridLine));
+        this.minorGrid.push(this.drawLine(horizontalLines.outline, minorGridStyle));
       }
     }
   }
 
-  drawVerticalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle) {
-    for (let j = xMin; j < xMax; j += 1) {
+  drawVerticalGrid(xMin, yMin, xMax, yMax, unitLength, majorGridStyle, minorGridStyle) {
+    for (let j = xMin; j <= xMax; j += 1) {
       const verticalLines = {
         outline: [
-          { x: j * unitLength, y: yMin },
+          { x: j * unitLength, y: yMin * unitLength },
           { x: j * unitLength, y: yMax * unitLength },
         ],
       };
       if (j % 5 === 0) {
-        this.majorGrid.push(this.drawLine(verticalLines.outline, gridStyle.majorGridLine));
+        this.majorGrid.push(this.drawLine(verticalLines.outline, majorGridStyle));
       } else {
-        this.minorGrid.push(this.drawLine(verticalLines.outline, gridStyle.minorGridLine));
+        this.minorGrid.push(this.drawLine(verticalLines.outline, minorGridStyle));
       }
     }
   }
 
-  drawGrid(unitLength, gridStyle) {
-    const xMax = this.maxX / unitLength;
-    const yMax = this.maxY / unitLength;
-    const xMin = this.minX;
-    const yMin = this.minY;
+  drawGrid(unitLength, majGridStyle, minGridStyle) {
+    if (unitLength > 0) {
+      const xMax = this.width / unitLength;
+      const yMax = this.height / unitLength;
+      const xMin = Math.floor(this.minX / unitLength);
+      const yMin = Math.floor(this.minY / unitLength);
+      const newMajStyle = majGridStyle !== undefined ? majGridStyle : defaultStyle.gridStyle.major;
+      const newMinStyle = minGridStyle !== undefined ? minGridStyle : defaultStyle.gridStyle.minor;
 
-    this.drawHorizontalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle);
-    this.drawVerticalGrid(xMin, yMin, xMax, yMax, unitLength, gridStyle);
+      this.drawHorizontalGrid(xMin, yMin, xMax, yMax, unitLength, newMajStyle, newMinStyle);
+      this.drawVerticalGrid(xMin, yMin, xMax, yMax, unitLength, newMajStyle, newMinStyle);
+    } else {
+      // eslint-disable-next-line
+      console.warn('drawGrid: Error, unitLength is not a number greater than 0');
+    }
   }
 }
