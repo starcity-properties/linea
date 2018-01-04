@@ -1137,7 +1137,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Door = function (_Feature) {
   _inherits(Door, _Feature);
 
-  function Door(canvas, origin, outline, angle, direction, id, dStyle, dStopStyle, dProjectionStyle) {
+  function Door(canvas, origin, outline, angle, clockwise, id, dStyle, dStopStyle, dProjectionStyle) {
     _classCallCheck(this, Door);
 
     var _this = _possibleConstructorReturn(this, (Door.__proto__ || Object.getPrototypeOf(Door)).call(this, canvas));
@@ -1150,7 +1150,7 @@ var Door = function (_Feature) {
     _this.id = id !== undefined && id;
     _this.angle = angle !== undefined && angle;
     _this.radius = Door.lineLen(_this.outline[0], _this.outline[1]);
-    _this.curve = direction ? 'concave' : 'convex';
+    _this.curve = clockwise ? 'concave' : 'convex';
     _this.doors = [];
     _this.doorStyle = dStyle !== undefined ? dStyle : _styles2.default.doorStyle.door.default;
     _this.doorStopStyle = dStopStyle !== undefined ? dStopStyle : _styles2.default.doorStyle.doorStop.default;
@@ -1170,8 +1170,7 @@ var Door = function (_Feature) {
       };
 
       var baseAngle = _snapsvgCjs2.default.rad(_snapsvgCjs2.default.angle(hinge.x, hinge.y, end.x, end.y)) - Math.PI;
-      var supportAngle = Door.getSupportAngle(baseAngle, hinge, end, this.radius);
-      var doorAngle = Door.getDoorAngle(this.curve, baseAngle, this.angle, supportAngle);
+      var doorAngle = Door.getDoorAngle(this.curve, baseAngle, this.angle);
 
       openPoint.x = this.radius * Math.cos(doorAngle) + hinge.x;
       openPoint.y = this.radius * Math.sin(doorAngle) + hinge.y;
@@ -1184,25 +1183,14 @@ var Door = function (_Feature) {
       this.doors.push(lines);
     }
   }], [{
-    key: 'getSupportAngle',
-    value: function getSupportAngle(baseAngle, hingePnt, endPnt, radius) {
-      if (hingePnt.x !== endPnt.x && hingePnt.y !== endPnt.y) {
-        if (baseAngle === Math.PI || baseAngle === 0) {
-          return Math.acos(Door.lineLen([hingePnt, { x: endPnt.x, y: hingePnt.y }]) / radius);
-        }
-        return Math.acos(Door.lineLen([hingePnt, { x: hingePnt.x, y: endPnt.y }]) / radius);
-      }
-      return 0;
-    }
-  }, {
     key: 'getDoorAngle',
-    value: function getDoorAngle(curve, baseAngle, angle, supportAngle) {
+    value: function getDoorAngle(curve, baseAngle, angle) {
       var doorAngle = 0;
 
       if (curve === 'concave') {
-        doorAngle = baseAngle + _snapsvgCjs2.default.rad(angle) + supportAngle;
+        doorAngle = baseAngle + _snapsvgCjs2.default.rad(angle);
       } else {
-        doorAngle = baseAngle - _snapsvgCjs2.default.rad(angle) - supportAngle;
+        doorAngle = baseAngle - _snapsvgCjs2.default.rad(angle);
       }
 
       if (doorAngle > 2 * Math.PI) {
