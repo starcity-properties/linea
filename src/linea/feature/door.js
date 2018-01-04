@@ -3,7 +3,7 @@ import Feature from './feature';
 import defaultStyle from '../style/styles';
 
 export default class Door extends Feature {
-  constructor(canvas, origin, outline, angle, direction, id, dStyle, dStopStyle, dProjectionStyle) {
+  constructor(canvas, origin, outline, angle, clockwise, id, dStyle, dStopStyle, dProjectionStyle) {
     super(canvas);
     this.outline = outline !== undefined && Door.addOrigin(outline, origin);
     if (this.outline.length < 2) {
@@ -13,7 +13,7 @@ export default class Door extends Feature {
     this.id = id !== undefined && id;
     this.angle = angle !== undefined && angle;
     this.radius = Door.lineLen(this.outline[0], this.outline[1]);
-    this.curve = direction ? 'concave' : 'convex';
+    this.curve = clockwise ? 'concave' : 'convex';
     this.doors = [];
     this.doorStyle = dStyle !== undefined
       ? dStyle : defaultStyle.doorStyle.door.default;
@@ -24,23 +24,13 @@ export default class Door extends Feature {
     this.features.push(this.doors);
   }
 
-  static getSupportAngle(baseAngle, hingePnt, endPnt, radius) {
-    if (hingePnt.x !== endPnt.x && hingePnt.y !== endPnt.y) {
-      if (baseAngle === Math.PI || baseAngle === 0) {
-        return Math.acos(Door.lineLen([hingePnt, { x: endPnt.x, y: hingePnt.y }]) / radius);
-      }
-      return Math.acos(Door.lineLen([hingePnt, { x: hingePnt.x, y: endPnt.y }]) / radius);
-    }
-    return 0;
-  }
-
-  static getDoorAngle(curve, baseAngle, angle, supportAngle) {
+  static getDoorAngle(curve, baseAngle, angle) {
     let doorAngle = 0;
 
     if (curve === 'concave') {
-      doorAngle = baseAngle + Snap.rad(angle) + supportAngle;
+      doorAngle = baseAngle + Snap.rad(angle);
     } else {
-      doorAngle = baseAngle - Snap.rad(angle) - supportAngle;
+      doorAngle = baseAngle - Snap.rad(angle);
     }
 
     if (doorAngle > 2 * Math.PI) {
@@ -61,8 +51,7 @@ export default class Door extends Feature {
     };
 
     const baseAngle = Snap.rad(Snap.angle(hinge.x, hinge.y, end.x, end.y)) - Math.PI;
-    const supportAngle = Door.getSupportAngle(baseAngle, hinge, end, this.radius);
-    const doorAngle = Door.getDoorAngle(this.curve, baseAngle, this.angle, supportAngle);
+    const doorAngle = Door.getDoorAngle(this.curve, baseAngle, this.angle);
 
     openPoint.x = (this.radius * Math.cos(doorAngle)) + hinge.x;
     openPoint.y = (this.radius * Math.sin(doorAngle)) + hinge.y;
