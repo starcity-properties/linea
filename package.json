@@ -1,6 +1,6 @@
 {
     "name": "linea",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "A javascript library to draw floorplans",
     "main": "dist/minified-linea/linea-min.js",
     "module": "src/index.js",
@@ -54,7 +54,7 @@
     "eslintConfig": {
         "extends": "airbnb-base"
     },
-    "dependencies": {
+    "peerDependencies": {
         "snapsvg-cjs": "^0.0.6"
     },
     "devDependencies": {

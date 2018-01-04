@@ -52,7 +52,7 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 // This lets us display how much they changed later.
 configs.forEach((item) => {
   const configPath = item.output.path;
-  const configPublicPath = item.output.publicPath;
+  // const configPublicPath = item.output.publicPath;
   measureFileSizesBeforeBuild(configPath)
     .then((previousFileSizes) => {
       // Remove all content but keep the directory so that

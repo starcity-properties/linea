@@ -1,18 +1,27 @@
 import Snap from 'snapsvg-cjs';
 import Feature from './feature';
+import defaultStyle from '../style/styles';
 
 export default class Door extends Feature {
-  constructor(canvas, origin, outline, angle, direction, id, style) {
+  constructor(canvas, origin, outline, angle, direction, id, dStyle, dStopStyle, dProjectionStyle) {
     super(canvas);
-    this.outline = Door.addOrigin(outline, origin);
-    this.origin = origin;
-    this.id = id;
-    this.angle = angle;
+    this.outline = outline !== undefined && Door.addOrigin(outline, origin);
+    if (this.outline.length < 2) {
+      throw Error('Not enough valid points in Door Outline');
+    }
+    this.origin = origin !== undefined && origin;
+    this.id = id !== undefined && id;
+    this.angle = angle !== undefined && angle;
     this.radius = Door.lineLen(this.outline[0], this.outline[1]);
     this.curve = direction ? 'concave' : 'convex';
     this.doors = [];
-    this.doorStyle = style.door.default;
-    this.projectionStyle = style.projection.default;
+    this.doorStyle = dStyle !== undefined
+      ? dStyle : defaultStyle.doorStyle.door.default;
+    this.doorStopStyle = dStopStyle !== undefined
+      ? dStopStyle : defaultStyle.doorStyle.doorStop.default;
+    this.projectionStyle = dProjectionStyle !== undefined
+      ? dProjectionStyle : defaultStyle.doorStyle.projection.default;
+    this.features.push(this.doors);
   }
 
   static getSupportAngle(baseAngle, hingePnt, endPnt, radius) {
@@ -63,10 +72,10 @@ export default class Door extends Feature {
     const stop = [hinge, openPoint];
     lines.push(
       this.drawLine(door, this.doorStyle),
-      this.drawLine(stop, this.projectionStyle),
+      this.drawLine(stop, this.doorStopStyle),
       this.drawPathOutline(curve, false, this.projectionStyle),
     );
 
-    this.features.push(this.doors.push(lines));
+    this.doors.push(lines);
   }
 }

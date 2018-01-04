@@ -1,39 +1,36 @@
 import Outline from './outline';
+import defaultStyle from './style/styles';
 
 export default class Floorplan extends Outline {
-  constructor(canvas, origin, outline, id, style) {
+  constructor(canvas, origin, outline, id, outlineStyle) {
     super(canvas);
-    this.outline = Floorplan.addOrigin(outline, origin);
-    this.origin = origin;
-    this.id = id;
-    this.style = style;
+    this.outline = outline !== undefined && Floorplan.addOrigin(outline, origin);
+    this.origin = origin !== undefined && origin;
+    this.id = id !== undefined && id;
+    this.style = outlineStyle !== undefined ? outlineStyle : defaultStyle.roomOutline.default;
     this.rooms = [];
     this.features = [];
   }
 
   addRoom(origin, ...rooms) {
     rooms.forEach((item) => {
-      const newItem = item;
-      newItem.outline = Floorplan.addOrigin(item.outline, origin);
-      newItem.outline = Floorplan.addOrigin(item.outline, this.origin);
-      newItem.features.forEach((feature) => {
-        const newFeature = feature;
-        newFeature.outline = Floorplan.addOrigin(newFeature.outline, origin);
-        return newFeature;
-      });
-      this.rooms.push(newItem);
-    });
-  }
-
-  // need to add origin modifier to this
-  addFeatures(origin, ...Features) {
-    Features.forEach((array) => {
-      array.forEach((feature) => {
-        const newFeature = feature;
-        newFeature.outline = Floorplan.addOrigin(newFeature.outline, origin);
-        newFeature.outline = Floorplan.addOrigin(newFeature.outline, this.origin);
-        this.features.push(newFeature);
-      });
+      const newItem = item.outline !== undefined && item;
+      if (newItem) {
+        newItem.outline = origin !== undefined &&
+          Floorplan.addOrigin(item.outline, origin);
+        newItem.outline = this.origin !== undefined &&
+          Floorplan.addOrigin(item.outline, this.origin);
+        newItem.features.forEach((feature) => {
+          const newFeature = feature;
+          newFeature.outline = origin !== undefined &&
+            Floorplan.addOrigin(newFeature.outline, origin);
+          return newFeature;
+        });
+        this.rooms.push(newItem);
+      } else {
+        // eslint-disable-next-line
+        console.warn(`Room or room outline is udefined ${item}`);
+      }
     });
   }
 

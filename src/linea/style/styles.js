@@ -1,11 +1,19 @@
 // Styles to be used in rendering our floorplans
-const style = {
+const defaultStyle = {
+  labelStyle: {
+    textAnchor: 'middle',
+    alignmentBaseline: 'middle',
+    fontSize: 8,
+  },
+  circleStyle: {
+    stroke: 'black',
+  },
   gridStyle: {
-    majorGridLine: {
+    major: {
       stroke: '#cccccc',
       strokeWidth: 1,
     },
-    minorGridLine: {
+    minor: {
       stroke: '#eaeaea',
       strokeWidth: 1,
     },
@@ -115,4 +123,4 @@ const style = {
   },
 };
 
-export default style;
+export default defaultStyle;

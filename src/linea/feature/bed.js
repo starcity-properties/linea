@@ -1,15 +1,21 @@
 import Snap from 'snapsvg-cjs';
 import Feature from './feature';
+import defaultStyle from '../style/styles';
 
 export default class Bed extends Feature {
-  constructor(canvas, origin, outline, id, style, label) {
+  constructor(canvas, origin, outline, id, bedStyle, label, labelStyle) {
     super(canvas);
-    this.outline = Bed.addOrigin(outline, origin);
-    this.origin = origin;
-    this.id = id;
-    this.style = style;
+    this.outline = outline !== undefined && Bed.addOrigin(outline, origin);
+    if (this.outline.length < 4) {
+      throw Error('Not enough valid points in Bed Outline');
+    }
+    this.origin = origin !== undefined && origin;
+    this.id = id !== undefined && id;
+    this.style = bedStyle !== undefined ? bedStyle : defaultStyle.bedStyle.default;
     this.label = label !== undefined ? label : false;
+    this.labelStyle = labelStyle !== undefined ? labelStyle : defaultStyle.labelStyle;
     this.beds = [];
+    this.features.push(this.beds);
   }
 
   static getPillPnts(xOffset, yOffset, lenght, height, origin) {
@@ -23,11 +29,11 @@ export default class Bed extends Feature {
     return pill;
   }
 
-  drawBed(outline, style, id, label) {
+  draw() {
     const bedObjs = [];
-    const hasLabel = label !== undefined ? label : false;
-    const topLPnt = outline[0];
-    const topRightPnt = outline[1];
+    const hasLabel = this.label;
+    const topLPnt = this.outline[0];
+    const topRightPnt = this.outline[1];
 
     const pillBuf = 2;
     const pillLen = (Bed.lineLen(topLPnt, topRightPnt) - (pillBuf * 3)) / 2;
@@ -38,30 +44,23 @@ export default class Bed extends Feature {
     let pillTwoPnts = [];
     pillTwoPnts = Bed.getPillPnts(pillLen + (pillBuf * 2), pillBuf, pillLen, pillHt, topLPnt);
 
-    const pillOne = this.drawPolygon(pillOnePnts, style);
-    const pillTwo = this.drawPolygon(pillTwoPnts, style);
-    const drawnBed = this.drawPolygon(outline, style);
+    const pillOne = this.drawPolygon(pillOnePnts, this.style);
+    const pillTwo = this.drawPolygon(pillTwoPnts, this.style);
+    const drawnBed = this.drawPolygon(this.outline, this.style);
 
     const pillAngle = Snap.angle(topRightPnt.x, topRightPnt.y, topLPnt.x, topLPnt.y);
-
     Bed.rotateObject(pillOne, pillAngle, topLPnt);
     Bed.rotateObject(pillTwo, pillAngle, topLPnt);
 
     bedObjs.push(drawnBed, pillOne, pillTwo);
 
     if (hasLabel) {
-      const bottomRightPnt = outline[2];
+      const bottomRightPnt = this.outline[2];
       const centerPnt = Bed.lineMidPnt(topLPnt, bottomRightPnt);
-      const newLabel = this.paper.text(centerPnt.x + (pillHt / 2), centerPnt.y, label);
-      newLabel.attr({ textAnchor: 'middle', alignmentBaseline: 'middle', fontSize: 8 });
-      bedObjs.push(newLabel);
+      this.writeLabel(centerPnt.x + (pillHt / 2), centerPnt.y, this.label, this.labelStyle);
     }
 
-    bedObjs.id = id;
+    bedObjs.id = this.id;
     this.beds.push(bedObjs);
-  }
-
-  draw() {
-    this.features.push(this.beds.push(this.drawBed(this.outline, this.style, this.id, this.label)));
   }
 }

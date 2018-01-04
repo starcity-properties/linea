@@ -1,4 +1,5 @@
 import Drawing from '../drawing';
+import defaultStyle from '../style/styles';
 
 export default class Feature extends Drawing {
   constructor(canvas) {
@@ -6,13 +7,19 @@ export default class Feature extends Drawing {
     this.features = [];
   }
 
-  drawRectWithLabel(outline, style, label) {
+  drawRectWithLabel(outline, style, label, labelStyle) {
     const rectObjs = [];
-    const centerPoint = Feature.lineMidPnt(outline[0], outline[2]);
-    rectObjs.push(this.paper.polygon(Feature.generateLineArray(outline)).attr(style));
+    const hasLabel = label !== undefined ? label : false;
+    const newOutline = outline !== undefined && Feature.checkOutline(outline);
+    if (newOutline.length < 4) {
+      throw Error('Not enough valid points in Rect Outline');
+    }
+    const centerPoint = Feature.lineMidPnt(newOutline[0], newOutline[2]);
+    rectObjs.push(this.paper.polygon(Feature.generateLineArray(newOutline)).attr(style));
 
-    if (label) {
-      rectObjs.push(this.paper.text(centerPoint.x, centerPoint.y, label).attr({ textAnchor: 'middle', alignmentBaseline: 'middle', fontSize: 8 }));
+    if (hasLabel) {
+      const newLabelStyle = labelStyle !== undefined ? labelStyle : defaultStyle.labelStyle;
+      rectObjs.push(this.paper.text(centerPoint.x, centerPoint.y, label).attr(newLabelStyle));
     }
 
     return rectObjs;
